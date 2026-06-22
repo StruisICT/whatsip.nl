@@ -1,0 +1,16 @@
+{
+  "name": "whatsip.nl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "whatsip.nl — a tiny, very fast what's-my-IP site (Cloudflare Pages + edge functions)",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240620.0",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.60.0"
+  }
+}

@@ -51,9 +51,26 @@ visitor ──https──> Cloudflare edge
 - **AdSense**: low RPM utility niche ($0.5–3/1k views), high ad-block audience. Ship
   fast/ad-free first, lazy-load ads after first paint, add content pages for approval.
 
+## AdSense (included from the start)
+
+- Script in `index.html` <head>: `client=ca-pub-1732510177342289`.
+- `public/ads.txt` authorises the publisher (required by AdSense).
+- One responsive display unit on the page — **replace `data-ad-slot="0000000000"`**
+  with a real slot ID from the AdSense dashboard, or switch to Auto Ads.
+- CSP in `public/_headers` is tuned to allow Google ad domains.
+- `privacy.html` covers AdSense cookie/ad-personalisation disclosure (needed for approval).
+
+## Build / deploy
+
+- Static in `public/`, edge functions in `functions/`, `wrangler.toml` → `pages_build_output_dir`.
+- Local: `npm install` then `npm run dev` (wrangler pages dev). Typecheck: `npm run typecheck`.
+- Deploy: connect the repo in Cloudflare Pages (auto-deploy on push to `main`, preview per PR),
+  or `npm run deploy`. GitHub Actions runs a typecheck gate (`.github/workflows/ci.yml`).
+
 ## Open items
 
 - [ ] Move `whatsip.nl` to a Cloudflare zone (status: "almost").
-- [ ] Decide field set for the IP page.
-- [ ] AdSense: defer until content pages + traffic exist.
+- [ ] Create the AdSense ad unit and paste its real `data-ad-slot` ID.
+- [ ] Connect the repo to Cloudflare Pages + map the `whatsip.nl` domain.
+- [ ] Verify ads render (check CSP if blocked) and submit site for AdSense review.
 - [ ] Repo public or private (currently private).

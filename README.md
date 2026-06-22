@@ -7,10 +7,22 @@ See [`PLAN.md`](./PLAN.md) for the architecture, pipeline, and cost analysis.
 
 ## Status
 
-Planning. Repo scaffolded; build not started.
+Built. Static site + edge functions + AdSense wired in. Pending Cloudflare Pages
+connection and the real AdSense slot ID.
 
-## Quick links (planned)
+## Layout
 
-- `index.html` — the page (static, CDN).
-- `functions/ip.ts` — edge function: returns the visitor IP.
-- `/ip` — `curl whatsip.nl/ip`.
+- `public/index.html` — the page (static, CDN, AAA contrast, dark/light).
+- `public/privacy.html` — privacy policy (AdSense disclosure).
+- `public/ads.txt` — AdSense authorisation.
+- `public/_headers` — security + caching headers (AdSense-compatible CSP).
+- `functions/api/info.ts` — edge function: JSON `{ ip, asn, org, country, ... }`.
+- `functions/ip.ts` — edge function: plain-text IP (`curl whatsip.nl/ip`).
+
+## Develop
+
+```bash
+npm install
+npm run dev        # wrangler pages dev (local edge runtime)
+npm run typecheck
+```
