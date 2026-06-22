@@ -19,6 +19,11 @@ connection and the real AdSense slot ID.
 - `functions/api/info.ts` — edge function: JSON `{ ip, asn, org, country, ... }`.
 - `functions/ip.ts` — edge function: plain-text IP (`curl whatsip.nl/ip`).
 
+## Deploy
+
+Cloudflare Pages via Git integration (push to `main` → production, PR → preview).
+Full runbook: [`CLOUDFLARE.md`](./CLOUDFLARE.md).
+
 ## Develop
 
 ```bash
