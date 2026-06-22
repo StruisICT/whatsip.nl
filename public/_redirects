@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects.
+# No 404 page: any unknown URL redirects to the main page. This splat rule has
+# the lowest priority — real static assets, clean URLs (/browser -> browser.html)
+# and Functions (/ip, /api/*) are served normally and never hit this rule.
+/*    /    302
