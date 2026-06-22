@@ -1,6 +1,7 @@
 # Cloudflare setup — whatsip.nl
 
-The site is **Cloudflare Pages** (static `public/` + edge `functions/`). No tunnel,
+The site is **Cloudflare Pages**: templates in `src/` are built by `scripts/build.mjs`
+into `dist/` (static `/en` + `/nl` pages), served alongside edge `functions/`. No tunnel,
 no origin server. The release pipeline is Pages' **Git integration**: push to
 `main` → production deploy; open a PR → preview deploy; history → one-click rollback.
 
@@ -57,10 +58,11 @@ Open the page → IP shows instantly, Copy works, dark/light toggles.
 
 1. In AdSense → **Sites** → add `whatsip.nl` → request review.
 2. Create a **display ad unit**, copy its **slot ID**, and replace
-   `data-ad-slot="0000000000"` in `public/index.html` (or enable Auto Ads and
-   remove the `<ins>` block).
+   `data-ad-slot="0000000000"` in the **5 `src/pages/*.html` templates** — home,
+   browser, headers, webrtc, ipv6 (or enable Auto Ads and remove the `<ins>`
+   blocks), then rebuild.
 3. If ads don't render, widen the `script-src` / `frame-src` allowlist in
-   `public/_headers` (CSP is the usual culprit).
+   `src/static/_headers` (CSP is the usual culprit).
 
 ## Alternative — deploy from the CLI (for a quick test before Git is connected)
 
@@ -68,7 +70,7 @@ Open the page → IP shows instantly, Copy works, dark/light toggles.
 npm install
 npx wrangler login                 # browser OAuth
 npx wrangler pages project create whatsip --production-branch main
-npm run deploy                     # wrangler pages deploy public
+npm run deploy                     # build + wrangler pages deploy dist
 ```
 
 This gives an immediate `*.pages.dev` URL but **no auto-deploy on push** — prefer

@@ -2,6 +2,5 @@ node_modules/
 dist/
 .wrangler/
 .dev.vars
-dist/
 .DS_Store
 *.log
