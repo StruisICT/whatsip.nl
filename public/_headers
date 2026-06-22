@@ -12,5 +12,11 @@
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
+/style.css
+  Cache-Control: public, max-age=86400
+
+/app.js
+  Cache-Control: public, max-age=86400
+
 /ads.txt
   Cache-Control: public, max-age=86400

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Browser info — whatsip.nl</title>
+  <meta name="description" content="See what your browser reveals: device, operating system, screen, GPU, languages, timezone and connection type. Read locally, never sent anywhere." />
+  <link rel="canonical" href="https://whatsip.nl/browser" />
+  <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">whatsip<span>.nl</span></a>
+    <nav class="tabs" aria-label="Tools">
+      <a href="/">My IP</a>
+      <a href="/browser" aria-current="page">Browser</a>
+      <a href="/headers">Headers</a>
+      <a class="soon" aria-disabled="true">DNS</a>
+    </nav>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch colour theme">🌓</button>
+  </header>
+
+  <main>
+    <div class="page">
+      <h1 class="title">Browser &amp; device info</h1>
+      <p class="label">Everything below is read locally in your browser — it is not sent to us.</p>
+      <section class="grid" id="grid" aria-label="Browser details"></section>
+
+      <ins class="adsbygoogle ad" style="display:block"
+           data-ad-client="ca-pub-1732510177342289" data-ad-slot="0000000000"
+           data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </main>
+
+  <footer>No cookies. No tracking. &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a></footer>
+
+  <script>
+    function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
+    function field(k,v){if(v===null||v===undefined||v===""||v==="unknown")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
+
+    function gpu(){try{var c=document.createElement("canvas");var gl=c.getContext("webgl")||c.getContext("experimental-webgl");if(!gl)return null;var i=gl.getExtension("WEBGL_debug_renderer_info");return i?gl.getParameter(i.UNMASKED_RENDERER_WEBGL):null;}catch(e){return null;}}
+
+    var n=navigator, s=screen, conn=n.connection||n.mozConnection||n.webkitConnection||{};
+    var uaD=n.userAgentData;
+    var tz=null;try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){}
+
+    document.getElementById("grid").innerHTML=
+      field("Browser",uaD&&uaD.brands?uaD.brands.map(function(b){return b.brand+" "+b.version;}).filter(function(x){return !/Not.?A.?Brand/i.test(x);}).join(", "):null)+
+      field("Platform",uaD?uaD.platform:n.platform)+
+      field("Mobile",uaD?(uaD.mobile?"Yes":"No"):null)+
+      field("Languages",(n.languages||[n.language]).join(", "))+
+      field("Timezone",tz)+
+      field("Screen",s.width+"×"+s.height+" ("+(s.colorDepth)+"-bit)")+
+      field("Viewport",window.innerWidth+"×"+window.innerHeight)+
+      field("Pixel ratio",window.devicePixelRatio)+
+      field("CPU cores",n.hardwareConcurrency)+
+      field("Device memory",n.deviceMemory?n.deviceMemory+" GB":null)+
+      field("Touch points",n.maxTouchPoints)+
+      field("GPU",gpu())+
+      field("Connection",conn.effectiveType?conn.effectiveType.toUpperCase()+(conn.downlink?" · ~"+conn.downlink+" Mbps":"")+(conn.rtt?" · "+conn.rtt+" ms":""):null)+
+      field("Save-Data",conn.saveData?"On":null)+
+      field("Cookies enabled",n.cookieEnabled?"Yes":"No")+
+      field("Do Not Track",n.doNotTrack==="1"?"On":"Off")+
+      field("Online",n.onLine?"Yes":"No")+
+      field("User agent",n.userAgent);
+  </script>
+</body>
+</html>

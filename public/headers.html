@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Request headers — whatsip.nl</title>
+  <meta name="description" content="See the HTTP request headers your browser sends to every website (User-Agent, Accept-Language, and more). Cookies are redacted." />
+  <link rel="canonical" href="https://whatsip.nl/headers" />
+  <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">whatsip<span>.nl</span></a>
+    <nav class="tabs" aria-label="Tools">
+      <a href="/">My IP</a>
+      <a href="/browser">Browser</a>
+      <a href="/headers" aria-current="page">Headers</a>
+      <a class="soon" aria-disabled="true">DNS</a>
+    </nav>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch colour theme">🌓</button>
+  </header>
+
+  <main>
+    <div class="page">
+      <h1 class="title">Your request headers</h1>
+      <p class="label">The HTTP headers your browser sent on this request. Cookies are redacted.</p>
+      <section class="grid" id="grid" aria-label="Request headers"></section>
+      <button class="btn" id="copy" type="button" style="margin-top:1.25rem" disabled>Copy as JSON</button>
+
+      <ins class="adsbygoogle ad" style="display:block"
+           data-ad-client="ca-pub-1732510177342289" data-ad-slot="0000000000"
+           data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </main>
+
+  <footer>No cookies. No tracking. &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a></footer>
+
+  <script>
+    function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
+    fetch("/api/headers",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+      var h=d.headers||{};
+      document.getElementById("grid").innerHTML=Object.keys(h).map(function(k){
+        return '<div class="field"><div class="k">'+esc(k)+'</div><div class="v">'+esc(h[k])+"</div></div>";
+      }).join("")||'<p class="label">No headers.</p>';
+      var btn=document.getElementById("copy");
+      btn.disabled=false;
+      btn.addEventListener("click",function(){window.whatsipCopy(JSON.stringify(h,null,2),btn);});
+    }).catch(function(){document.getElementById("grid").innerHTML='<p class="label">Could not load headers.</p>';});
+  </script>
+</body>
+</html>

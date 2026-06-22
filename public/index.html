@@ -1,162 +1,60 @@
 <!doctype html>
-<html lang="en" data-theme="auto">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>whatsip.nl — What is my IP address?</title>
-  <meta name="description" content="Instantly see your public IP address (IPv4 / IPv6), ASN, and location. Fast, private, no cookies, no tracking. Plain-text endpoint: curl whatsip.nl/ip" />
+  <meta name="description" content="Instantly see your public IP address (IPv4 / IPv6), ISP, location, reverse DNS, TLS and latency. Fast, private, no cookies. Plain text: curl whatsip.nl/ip" />
   <link rel="canonical" href="https://whatsip.nl/" />
   <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <meta property="og:title" content="whatsip.nl — What is my IP address?" />
-  <meta property="og:description" content="Instantly see your public IP, ASN and location. Fast and private." />
+  <meta property="og:description" content="Your public IP, ISP, location, reverse DNS, TLS and latency. Fast and private." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://whatsip.nl/" />
-
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289"
-          crossorigin="anonymous"></script>
-
-  <style>
-    :root {
-      color-scheme: light dark;
-      --bg: #ffffff;
-      --surface: #f3f5f7;
-      --border: #c4ccd4;
-      --text: #14181c;       /* ~16:1 on white — AAA */
-      --muted: #41505c;      /* ~7.4:1 on white — AAA */
-      --accent: #0a5c2e;     /* green, ~7.1:1 on white — AAA */
-      --accent-fg: #ffffff;
-      --focus: #0a5c2e;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b0f14;
-        --surface: #161c24;
-        --border: #2c3742;
-        --text: #f0f4f8;     /* ~16:1 on bg — AAA */
-        --muted: #aebdc9;    /* ~8.5:1 on bg — AAA */
-        --accent: #5fe39b;   /* ~9:1 on bg — AAA */
-        --accent-fg: #08130c;
-        --focus: #5fe39b;
-      }
-    }
-    [data-theme="light"] {
-      color-scheme: light;
-      --bg:#fff; --surface:#f3f5f7; --border:#c4ccd4; --text:#14181c; --muted:#41505c; --accent:#0a5c2e; --accent-fg:#fff; --focus:#0a5c2e;
-    }
-    [data-theme="dark"] {
-      color-scheme: dark;
-      --bg:#0b0f14; --surface:#161c24; --border:#2c3742; --text:#f0f4f8; --muted:#aebdc9; --accent:#5fe39b; --accent-fg:#08130c; --focus:#5fe39b;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    a { color: var(--accent); }
-    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
-
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 1rem; padding: 1rem 1.25rem; max-width: 760px; width: 100%; margin: 0 auto;
-    }
-    .brand { font-weight: 700; letter-spacing: -0.01em; }
-    .theme-btn {
-      background: var(--surface); color: var(--text); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.45rem 0.7rem; cursor: pointer; font: inherit; font-size: 0.9rem;
-    }
-    main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 0 1.25rem 2rem; }
-
-    .ip-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-      padding: 1.75rem 1.5rem; text-align: center;
-    }
-    .ip-label { color: var(--muted); font-size: 0.95rem; margin: 0 0 0.5rem; }
-    .ip-value {
-      font: 700 clamp(1.6rem, 6vw, 2.6rem)/1.1 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-      word-break: break-all; margin: 0;
-    }
-    .ip-family { color: var(--muted); font-size: 0.9rem; margin: 0.5rem 0 0; }
-    .copy-btn {
-      margin-top: 1rem; background: var(--accent); color: var(--accent-fg); border: 0;
-      border-radius: 9px; padding: 0.6rem 1.1rem; font: inherit; font-weight: 600; cursor: pointer;
-    }
-    .copy-btn[disabled] { opacity: 0.6; cursor: progress; }
-    .ip-value { cursor: pointer; }
-    .ip-value:hover { text-decoration: underline; text-underline-offset: 4px; }
-
-    .grid {
-      margin-top: 1.5rem; display: grid; gap: 0.75rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-    .field {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1rem;
-    }
-    .field .k { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
-    .field .v { font-weight: 600; word-break: break-word; }
-
-    details { margin-top: 1.5rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
-    summary { cursor: pointer; padding: 0.8rem 1rem; font-weight: 600; }
-    details pre {
-      margin: 0; padding: 0 1rem 1rem; overflow-x: auto; font-size: 0.85rem;
-      font-family: ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all;
-    }
-
-    .tip { margin-top: 1.5rem; color: var(--muted); font-size: 0.92rem; }
-    .tip code {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-      padding: 0.15rem 0.4rem; font-family: ui-monospace, Menlo, Consolas, monospace;
-    }
-    .ad { margin: 2rem auto 0; max-width: 760px; min-height: 90px; text-align: center; }
-    footer {
-      max-width: 760px; width: 100%; margin: 0 auto; padding: 1.5rem 1.25rem 2rem;
-      color: var(--muted); font-size: 0.85rem; text-align: center;
-    }
-    .err { color: var(--muted); }
-    @media (prefers-reduced-motion: no-preference) { .copy-btn { transition: opacity .15s; } }
-  </style>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/app.js"></script>
 </head>
 <body>
-  <header>
-    <span class="brand">whatsip.nl</span>
-    <button class="theme-btn" id="theme" type="button" aria-label="Switch colour theme">🌓 Theme</button>
+  <header class="nav">
+    <a class="brand" href="/">whatsip<span>.nl</span></a>
+    <nav class="tabs" aria-label="Tools">
+      <a href="/" aria-current="page">My IP</a>
+      <a href="/browser">Browser</a>
+      <a href="/headers">Headers</a>
+      <a class="soon" aria-disabled="true">DNS</a>
+    </nav>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch colour theme">🌓</button>
   </header>
 
   <main>
-    <section class="ip-card" aria-live="polite">
-      <p class="ip-label">Your public IP address</p>
-      <p class="ip-value" id="ip" title="Click to copy">…</p>
-      <p class="ip-family" id="family"></p>
-      <button class="copy-btn" id="copy" type="button" disabled>Copy IP</button>
-      <p class="ip-family" aria-hidden="true">or click the address above</p>
-    </section>
+    <div class="page">
+      <section class="card hero" aria-live="polite">
+        <p class="label">Your public IP address</p>
+        <p class="big" id="ip" title="Click to copy">…</p>
+        <p class="sub" id="family"></p>
+        <button class="btn" id="copy" type="button" disabled style="margin-top:1rem">Copy IP</button>
+      </section>
 
-    <section class="grid" id="grid" aria-label="Connection details"></section>
+      <section class="grid" id="grid" aria-label="Connection details"></section>
 
-    <details>
-      <summary>Show request headers</summary>
-      <pre id="headers">Loading…</pre>
-    </details>
+      <p class="tip">Power user? <code>curl whatsip.nl/ip</code> (plain text) ·
+        <code>curl whatsip.nl/api/info</code> (JSON)</p>
 
-    <p class="tip">Power user? <code>curl whatsip.nl/ip</code> returns your IP as plain text.
-      JSON: <code>curl whatsip.nl/api/info</code></p>
+      <!-- AdSense unit. Replace data-ad-slot with a real slot ID, or use Auto Ads. -->
+      <ins class="adsbygoogle ad" style="display:block"
+           data-ad-client="ca-pub-1732510177342289" data-ad-slot="0000000000"
+           data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-    <!-- Google AdSense ad unit. Replace data-ad-slot with a real slot ID from
-         your AdSense dashboard, or enable Auto Ads (script above) and remove this. -->
-    <ins class="adsbygoogle ad"
-         style="display:block"
-         data-ad-client="ca-pub-1732510177342289"
-         data-ad-slot="0000000000"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <section class="tools" aria-label="More tools">
+        <a class="tool" href="/browser"><span class="t">Browser info</span><span class="d">Device, screen, GPU, connection</span></a>
+        <a class="tool" href="/headers"><span class="t">Request headers</span><span class="d">What your browser sends</span></a>
+        <span class="tool soon"><span class="t">DNS leak test</span><span class="d">Which resolvers you use</span></span>
+      </section>
+    </div>
   </main>
 
   <footer>
@@ -165,78 +63,28 @@
   </footer>
 
   <script>
-    // Theme toggle (auto → light → dark), persisted.
-    (function () {
-      var root = document.documentElement;
-      var saved = localStorage.getItem("theme");
-      if (saved) root.setAttribute("data-theme", saved);
-      document.getElementById("theme").addEventListener("click", function () {
-        var order = ["auto", "light", "dark"];
-        var cur = root.getAttribute("data-theme") || "auto";
-        var next = order[(order.indexOf(cur) + 1) % order.length];
-        root.setAttribute("data-theme", next);
-        localStorage.setItem("theme", next);
-      });
-    })();
+    function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
+    function field(k,v){if(v===null||v===undefined||v==="")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
 
-    function field(k, v) {
-      if (v === null || v === undefined || v === "") return "";
-      return '<div class="field"><div class="k">' + k + '</div><div class="v">' +
-        String(v).replace(/[<>&]/g, function (c) { return { "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]; }) +
-        "</div></div>";
-    }
+    fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+      var ipEl=document.getElementById("ip");
+      ipEl.textContent=d.ip||"unknown";
+      document.getElementById("family").textContent=(d.family||"")+(d.colo?" · via "+d.colo:"");
 
-    fetch("/api/info", { cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        var ipEl = document.getElementById("ip");
-        ipEl.textContent = d.ip || "unknown";
-        document.getElementById("family").textContent = d.family ? d.family + (d.colo ? " · via " + d.colo : "") : "";
+      document.getElementById("grid").innerHTML=
+        field("ISP / network",d.org?d.org+(d.asn?" (AS"+d.asn+")":""):null)+
+        field("Location",[d.city,d.region,d.country].filter(Boolean).join(", ")||d.country)+
+        field("Reverse DNS",d.reverseDns)+
+        field("Latency",d.latencyMs!=null?d.latencyMs+" ms":null)+
+        field("Connection",[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "))+
+        field("Timezone",d.timezone);
 
-        var grid = document.getElementById("grid");
-        grid.innerHTML =
-          field("Network (ASN)", d.asn ? "AS" + d.asn : null) +
-          field("Organisation", d.org) +
-          field("Country", [d.city, d.region, d.country].filter(Boolean).join(", ") || d.country) +
-          field("Timezone", d.timezone) +
-          field("HTTP", d.httpProtocol) +
-          field("TLS", d.tlsVersion);
-
-        var btn = document.getElementById("copy");
-        var ipEl2 = document.getElementById("ip");
-        btn.disabled = false;
-
-        function copyIp() {
-          var text = d.ip || "";
-          if (!text) return;
-          var done = function () {
-            var t = btn.textContent; btn.textContent = "Copied ✓";
-            setTimeout(function () { btn.textContent = t; }, 1500);
-          };
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(done, fallback);
-          } else {
-            fallback();
-          }
-          function fallback() {
-            // Older browsers / non-secure contexts: select + execCommand.
-            var ta = document.createElement("textarea");
-            ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-            document.body.appendChild(ta); ta.select();
-            try { document.execCommand("copy"); done(); } catch (e) { /* ignore */ }
-            document.body.removeChild(ta);
-          }
-        }
-        btn.addEventListener("click", copyIp);
-        ipEl2.addEventListener("click", copyIp);
-
-        document.getElementById("headers").textContent =
-          Object.keys(d.headers || {}).map(function (k) { return k + ": " + d.headers[k]; }).join("\n") || "—";
-      })
-      .catch(function () {
-        document.getElementById("ip").textContent = "Could not detect IP";
-        document.getElementById("headers").textContent = "—";
-      });
+      var btn=document.getElementById("copy");
+      btn.disabled=false;
+      function copy(){window.whatsipCopy(d.ip||"",btn);}
+      btn.addEventListener("click",copy);
+      ipEl.addEventListener("click",copy);
+    }).catch(function(){document.getElementById("ip").textContent="Could not detect IP";});
   </script>
 </body>
 </html>
