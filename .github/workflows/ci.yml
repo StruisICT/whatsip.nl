@@ -13,5 +13,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Build static site
+        run: npm run build
       - name: Typecheck edge functions
         run: npm run typecheck

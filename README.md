@@ -12,12 +12,19 @@ connection and the real AdSense slot ID.
 
 ## Layout
 
-- `public/index.html` — the page (static, CDN, AAA contrast, dark/light).
-- `public/privacy.html` — privacy policy (AdSense disclosure).
-- `public/ads.txt` — AdSense authorisation.
-- `public/_headers` — security + caching headers (AdSense-compatible CSP).
-- `functions/api/info.ts` — edge function: JSON `{ ip, asn, org, country, ... }`.
-- `functions/ip.ts` — edge function: plain-text IP (`curl whatsip.nl/ip`).
+Bilingual (NL/EN) static site generated from `src/` into `dist/`.
+
+- `src/strings.json` — single source of all NL/EN copy.
+- `src/pages/*.html` + `*.js` — per-page content fragment + its script.
+- `src/static/*` — shared assets (`style.css`, `app.js`, `ads.txt`, `_headers`, `_redirects`, `robots.txt`).
+- `scripts/build.mjs` — generator → `dist/en/*`, `dist/nl/*`, `i18n.js`, `sitemap.xml`.
+- `functions/index.ts` — `/` → `Accept-Language` 302 to `/nl/` or `/en/`.
+- `functions/api/info.ts` — edge JSON `{ ip, asn, org, country, ... }`.
+- `functions/api/headers.ts` — edge JSON of request headers (cookies redacted).
+- `functions/ip.ts` — plain-text IP (`curl whatsip.nl/ip`).
+
+Live URLs: `/en/  /en/browser  /en/headers  /en/webrtc  /en/ipv6  /en/privacy`
+(and the `/nl/` equivalents). See [`docs/localized-urls.md`](docs/localized-urls.md).
 
 ## Deploy
 
@@ -28,6 +35,7 @@ Full runbook: [`CLOUDFLARE.md`](./CLOUDFLARE.md).
 
 ```bash
 npm install
-npm run dev        # wrangler pages dev (local edge runtime)
+npm run build      # generate dist/
+npm run dev        # build + wrangler pages dev dist (local edge runtime)
 npm run typecheck
 ```

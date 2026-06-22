@@ -1,0 +1,26 @@
+<main>
+  <div class="page">
+    <section class="card hero" aria-live="polite">
+      <p class="label">{{t:home.label}}</p>
+      <p class="big" id="ip" title="Click to copy">…</p>
+      <p class="sub" id="family"></p>
+      <button class="btn" id="copy" type="button" disabled style="margin-top:1rem">{{t:home.copy}}</button>
+    </section>
+
+    <section class="grid" id="grid" aria-label="Connection details"></section>
+
+    <p class="tip"><span>{{t:home.tip}}</span>
+      <code>curl whatsip.nl/ip</code> · <code>curl whatsip.nl/api/info</code></p>
+
+    <ins class="adsbygoogle ad" style="display:block"
+         data-ad-client="ca-pub-1732510177342289" data-ad-slot="0000000000"
+         data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+
+    <section class="tools" aria-label="More tools">
+      <a class="tool" href="{{base}}browser"><span class="t">{{t:tool.browser.t}}</span><span class="d">{{t:tool.browser.d}}</span></a>
+      <a class="tool" href="{{base}}headers"><span class="t">{{t:tool.headers.t}}</span><span class="d">{{t:tool.headers.d}}</span></a>
+      <span class="tool soon"><span class="t">{{t:tool.dns.t}}</span><span class="d">{{t:tool.dns.d}}</span></span>
+    </section>
+  </div>
+</main>

@@ -71,8 +71,10 @@ visitor ──https──> Cloudflare edge
 
 - Multi-page tools, each its own URL/SEO target: `/` (My IP), `/browser`, `/headers`,
   `/webrtc` (WebRTC leak test), `/ipv6` (IPv6). `DNS` is `soon` (needs DNS-logging infra).
-- **Bilingual NL/EN** (`i18n.js`): auto from browser/OS language, toggle in the top bar
-  (language + theme buttons, right side), persisted in localStorage.
+- **Bilingual NL/EN via localized URLs** (`/en/…`, `/nl/…`): generated from `src/` by
+  `scripts/build.mjs` → `dist/`, with hreflang + sitemap. Root `/` is a cookieless
+  `Accept-Language` router (`functions/index.ts`). Language button (top bar, right)
+  links to the sibling-language URL; theme button beside it. See `docs/localized-urls.md`.
 - **IPv6 caveat:** the page reliably shows *how you reached the site* (v4/v6, from the
   edge). The active capability probe needs **v4-only / v6-only hosts** (`ipv4.`/`ipv6.
   whatsip.nl`); Cloudflare Pages domains are proxied dual-stack, so a true single-stack

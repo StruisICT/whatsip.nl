@@ -23,11 +23,15 @@ zones allowed).
 2. Authorise GitHub, pick **`Struis112/whatsip.nl`**.
 3. Build settings:
    - Framework preset: **None**
-   - Build command: *(leave empty)*
-   - Build output directory: **`public`**
+   - Build command: **`npm run build`**  (runs `scripts/build.mjs` → `dist/`)
+   - Build output directory: **`dist`**
    - Root directory: **`/`**
-   - (Functions in `/functions` are auto-detected.)
+   - (Functions in `/functions` — incl. the `/` language router — are auto-detected.)
 4. **Save and Deploy.** First build publishes to `https://whatsip.pages.dev`.
+
+> The site is **bilingual**: content lives at `/en/…` and `/nl/…`, generated from
+> `src/` by the build. Visiting `/` 302-redirects to `/nl/` or `/en/` by
+> `Accept-Language` (the `functions/index.ts` router).
 
 Production branch = `main`. Every push to `main` deploys to production; every PR
 gets its own `*.whatsip.pages.dev` preview URL.
