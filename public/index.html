@@ -89,6 +89,8 @@
       border-radius: 9px; padding: 0.6rem 1.1rem; font: inherit; font-weight: 600; cursor: pointer;
     }
     .copy-btn[disabled] { opacity: 0.6; cursor: progress; }
+    .ip-value { cursor: pointer; }
+    .ip-value:hover { text-decoration: underline; text-underline-offset: 4px; }
 
     .grid {
       margin-top: 1.5rem; display: grid; gap: 0.75rem;
@@ -130,9 +132,10 @@
   <main>
     <section class="ip-card" aria-live="polite">
       <p class="ip-label">Your public IP address</p>
-      <p class="ip-value" id="ip">…</p>
+      <p class="ip-value" id="ip" title="Click to copy">…</p>
       <p class="ip-family" id="family"></p>
-      <button class="copy-btn" id="copy" type="button" disabled>Copy</button>
+      <button class="copy-btn" id="copy" type="button" disabled>Copy IP</button>
+      <p class="ip-family" aria-hidden="true">or click the address above</p>
     </section>
 
     <section class="grid" id="grid" aria-label="Connection details"></section>
@@ -200,13 +203,32 @@
           field("TLS", d.tlsVersion);
 
         var btn = document.getElementById("copy");
+        var ipEl2 = document.getElementById("ip");
         btn.disabled = false;
-        btn.addEventListener("click", function () {
-          navigator.clipboard.writeText(d.ip || "").then(function () {
+
+        function copyIp() {
+          var text = d.ip || "";
+          if (!text) return;
+          var done = function () {
             var t = btn.textContent; btn.textContent = "Copied ✓";
             setTimeout(function () { btn.textContent = t; }, 1500);
-          });
-        });
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, fallback);
+          } else {
+            fallback();
+          }
+          function fallback() {
+            // Older browsers / non-secure contexts: select + execCommand.
+            var ta = document.createElement("textarea");
+            ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand("copy"); done(); } catch (e) { /* ignore */ }
+            document.body.removeChild(ta);
+          }
+        }
+        btn.addEventListener("click", copyIp);
+        ipEl2.addEventListener("click", copyIp);
 
         document.getElementById("headers").textContent =
           Object.keys(d.headers || {}).map(function (k) { return k + ": " + d.headers[k]; }).join("\n") || "—";
