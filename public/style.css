@@ -3,13 +3,13 @@
   color-scheme: light dark;
   --bg: #ffffff; --surface: #f3f5f7; --border: #c4ccd4;
   --text: #14181c; --muted: #41505c; --accent: #0a5c2e; --accent-fg: #ffffff; --focus: #0a5c2e;
-  --nav-bg: rgba(255,255,255,0.85);
+  --warn: #6e4200; --nav-bg: rgba(255,255,255,0.85);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0b0f14; --surface: #161c24; --border: #2c3742;
     --text: #f0f4f8; --muted: #aebdc9; --accent: #5fe39b; --accent-fg: #08130c; --focus: #5fe39b;
-    --nav-bg: rgba(11,15,20,0.85);
+    --warn: #ffd479; --nav-bg: rgba(11,15,20,0.85);
   }
 }
 [data-theme="light"] { color-scheme: light;
@@ -90,6 +90,9 @@ details pre { margin: 0; padding: 0 1rem 1rem; overflow-x: auto; font-size: 0.85
 .tool.soon { opacity: 0.6; pointer-events: none; }
 .tool.soon .t::after { content: " · soon"; color: var(--muted); font-weight: 600; font-size: 0.75rem; }
 
+.status-ok { color: var(--accent); font-weight: 700; }
+.status-warn { color: var(--warn); font-weight: 700; }
+.status-line { font-size: 1.05rem; margin: 0; }
 .ad { margin: 2rem auto 0; max-width: 760px; min-height: 90px; text-align: center; }
 footer { max-width: 760px; width: 100%; margin: 0 auto; padding: 1.5rem 1.25rem 2rem; color: var(--muted); font-size: 0.85rem; text-align: center; }
 @media (prefers-reduced-motion: no-preference) { .btn, .tool { transition: opacity .15s, border-color .15s; } }

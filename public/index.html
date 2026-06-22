@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>whatsip.nl — What is my IP address?</title>
+  <title data-i18n="title.home">whatsip.nl — What is my IP address?</title>
   <meta name="description" content="Instantly see your public IP address (IPv4 / IPv6), ISP, location, reverse DNS, TLS and latency. Fast, private, no cookies. Plain text: curl whatsip.nl/ip" />
   <link rel="canonical" href="https://whatsip.nl/" />
   <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
@@ -15,33 +15,37 @@
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="/style.css" />
+  <script defer src="/i18n.js"></script>
   <script defer src="/app.js"></script>
 </head>
 <body>
   <header class="nav">
     <a class="brand" href="/">whatsip<span>.nl</span></a>
     <nav class="tabs" aria-label="Tools">
-      <a href="/" aria-current="page">My IP</a>
-      <a href="/browser">Browser</a>
-      <a href="/headers">Headers</a>
-      <a class="soon" aria-disabled="true">DNS</a>
+      <a href="/" aria-current="page" data-i18n="nav.myip">My IP</a>
+      <a href="/browser" data-i18n="nav.browser">Browser</a>
+      <a href="/headers" data-i18n="nav.headers">Headers</a>
+      <a href="/webrtc" data-i18n="nav.webrtc">WebRTC</a>
+      <a href="/ipv6" data-i18n="nav.ipv6">IPv6</a>
+      <a class="soon" aria-disabled="true" data-i18n="nav.dns">DNS</a>
     </nav>
-    <button class="theme-btn" id="theme" type="button" aria-label="Switch colour theme">🌓</button>
+    <button class="theme-btn" id="lang" type="button" data-i18n-aria="aria.lang">EN</button>
+    <button class="theme-btn" id="theme" type="button" data-i18n-aria="aria.theme">🌓</button>
   </header>
 
   <main>
     <div class="page">
       <section class="card hero" aria-live="polite">
-        <p class="label">Your public IP address</p>
+        <p class="label" data-i18n="home.label">Your public IP address</p>
         <p class="big" id="ip" title="Click to copy">…</p>
         <p class="sub" id="family"></p>
-        <button class="btn" id="copy" type="button" disabled style="margin-top:1rem">Copy IP</button>
+        <button class="btn" id="copy" type="button" disabled style="margin-top:1rem" data-i18n="home.copy">Copy IP</button>
       </section>
 
       <section class="grid" id="grid" aria-label="Connection details"></section>
 
-      <p class="tip">Power user? <code>curl whatsip.nl/ip</code> (plain text) ·
-        <code>curl whatsip.nl/api/info</code> (JSON)</p>
+      <p class="tip"><span data-i18n="home.tip">Power user?</span>
+        <code>curl whatsip.nl/ip</code> · <code>curl whatsip.nl/api/info</code></p>
 
       <!-- AdSense unit. Replace data-ad-slot with a real slot ID, or use Auto Ads. -->
       <ins class="adsbygoogle ad" style="display:block"
@@ -50,41 +54,44 @@
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
       <section class="tools" aria-label="More tools">
-        <a class="tool" href="/browser"><span class="t">Browser info</span><span class="d">Device, screen, GPU, connection</span></a>
-        <a class="tool" href="/headers"><span class="t">Request headers</span><span class="d">What your browser sends</span></a>
-        <span class="tool soon"><span class="t">DNS leak test</span><span class="d">Which resolvers you use</span></span>
+        <a class="tool" href="/browser"><span class="t" data-i18n="tool.browser.t">Browser info</span><span class="d" data-i18n="tool.browser.d">Device, screen, GPU, connection</span></a>
+        <a class="tool" href="/headers"><span class="t" data-i18n="tool.headers.t">Request headers</span><span class="d" data-i18n="tool.headers.d">What your browser sends</span></a>
+        <span class="tool soon"><span class="t" data-i18n="tool.dns.t">DNS leak test</span><span class="d" data-i18n="tool.dns.d">Which resolvers you use</span></span>
       </section>
     </div>
   </main>
 
   <footer>
-    No cookies. No tracking. Your IP is read at Cloudflare's edge and never stored.
-    &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a>
+    <span data-i18n="footer.privacyNote">No cookies. No tracking. Your IP is read at Cloudflare's edge and never stored.</span>
+    &nbsp;·&nbsp; <a href="/privacy.html" data-i18n="footer.privacy">Privacy</a>
   </footer>
 
   <script>
-    function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
-    function field(k,v){if(v===null||v===undefined||v==="")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
+    document.addEventListener("DOMContentLoaded", function () {
+      var t = window.t || function (k) { return k; };
+      function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
+      function field(k,v){if(v===null||v===undefined||v==="")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
 
-    fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
-      var ipEl=document.getElementById("ip");
-      ipEl.textContent=d.ip||"unknown";
-      document.getElementById("family").textContent=(d.family||"")+(d.colo?" · via "+d.colo:"");
+      fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+        var ipEl=document.getElementById("ip");
+        ipEl.textContent=d.ip||"unknown";
+        document.getElementById("family").textContent=(d.family||"")+(d.colo?" · via "+d.colo:"");
 
-      document.getElementById("grid").innerHTML=
-        field("ISP / network",d.org?d.org+(d.asn?" (AS"+d.asn+")":""):null)+
-        field("Location",[d.city,d.region,d.country].filter(Boolean).join(", ")||d.country)+
-        field("Reverse DNS",d.reverseDns)+
-        field("Latency",d.latencyMs!=null?d.latencyMs+" ms":null)+
-        field("Connection",[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "))+
-        field("Timezone",d.timezone);
+        document.getElementById("grid").innerHTML=
+          field(t("f.isp"),d.org?d.org+(d.asn?" (AS"+d.asn+")":""):null)+
+          field(t("f.location"),[d.city,d.region,d.country].filter(Boolean).join(", ")||d.country)+
+          field(t("f.rdns"),d.reverseDns)+
+          field(t("f.latency"),d.latencyMs!=null?d.latencyMs+" ms":null)+
+          field(t("f.connection"),[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "))+
+          field(t("f.timezone"),d.timezone);
 
-      var btn=document.getElementById("copy");
-      btn.disabled=false;
-      function copy(){window.whatsipCopy(d.ip||"",btn);}
-      btn.addEventListener("click",copy);
-      ipEl.addEventListener("click",copy);
-    }).catch(function(){document.getElementById("ip").textContent="Could not detect IP";});
+        var btn=document.getElementById("copy");
+        btn.disabled=false;
+        function copy(){window.whatsipCopy(d.ip||"",btn);}
+        btn.addEventListener("click",copy);
+        ipEl.addEventListener("click",copy);
+      }).catch(function(){document.getElementById("ip").textContent=t("err.ip");});
+    });
   </script>
 </body>
 </html>

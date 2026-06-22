@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title data-i18n="title.ipv6">IPv6 test — whatsip.nl</title>
+  <meta name="description" content="IPv6 connectivity test: see whether your internet connection supports IPv6 and which protocol you used to reach this site." />
+  <link rel="canonical" href="https://whatsip.nl/ipv6" />
+  <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/i18n.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/">whatsip<span>.nl</span></a>
+    <nav class="tabs" aria-label="Tools">
+      <a href="/" data-i18n="nav.myip">My IP</a>
+      <a href="/browser" data-i18n="nav.browser">Browser</a>
+      <a href="/headers" data-i18n="nav.headers">Headers</a>
+      <a href="/webrtc" data-i18n="nav.webrtc">WebRTC</a>
+      <a href="/ipv6" aria-current="page" data-i18n="nav.ipv6">IPv6</a>
+      <a class="soon" aria-disabled="true" data-i18n="nav.dns">DNS</a>
+    </nav>
+    <button class="theme-btn" id="lang" type="button" data-i18n-aria="aria.lang">EN</button>
+    <button class="theme-btn" id="theme" type="button" data-i18n-aria="aria.theme">🌓</button>
+  </header>
+
+  <main>
+    <div class="page">
+      <h1 class="title" data-i18n="v6.title">IPv6 connectivity test</h1>
+      <p class="label" data-i18n="v6.desc">Whether your connection can reach the internet over IPv6, and how you reached this site.</p>
+
+      <div class="card"><p class="status-line" id="capability" data-i18n="v6.testing">Testing…</p></div>
+      <section class="grid" id="grid" aria-label="IPv6 results"></section>
+
+      <ins class="adsbygoogle ad" style="display:block"
+           data-ad-client="ca-pub-1732510177342289" data-ad-slot="0000000000"
+           data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </main>
+
+  <footer><span data-i18n="footer.note">No cookies. No tracking.</span> &nbsp;·&nbsp; <a href="/privacy.html" data-i18n="footer.privacy">Privacy</a></footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var t = window.t || function (k) { return k; };
+      function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
+      function field(k,v){return '<div class="field"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+"</div></div>";}
+
+      var capEl=document.getElementById("capability"), gridEl=document.getElementById("grid");
+
+      fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+        gridEl.innerHTML=field(t("v6.reached"),(d.family||"?")+(d.ip?" ("+d.ip+")":""));
+      }).catch(function(){});
+
+      function probe(host){
+        return Promise.race([
+          fetch("https://"+host+"/ip?"+Date.now(),{mode:"no-cors",cache:"no-store"}).then(function(){return true;}).catch(function(){return false;}),
+          new Promise(function(res){setTimeout(function(){res(false);},4000);})
+        ]);
+      }
+      // ipv4.whatsip.nl = A-only control, ipv6.whatsip.nl = AAAA-only probe.
+      // Until those DNS records exist (zone pending), control fails -> "unavailable".
+      Promise.all([probe("ipv4.whatsip.nl"),probe("ipv6.whatsip.nl")]).then(function(r){
+        var control=r[0], v6=r[1];
+        if(!control){capEl.textContent=t("v6.unavail");capEl.className="status-line";}
+        else if(v6){capEl.textContent=t("v6.has");capEl.className="status-line status-ok";}
+        else {capEl.textContent=t("v6.no");capEl.className="status-line status-warn";}
+      });
+    });
+  </script>
+</body>
+</html>

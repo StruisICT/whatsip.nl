@@ -67,6 +67,17 @@ visitor ──https──> Cloudflare edge
 - Deploy: connect the repo in Cloudflare Pages (auto-deploy on push to `main`, preview per PR),
   or `npm run deploy`. GitHub Actions runs a typecheck gate (`.github/workflows/ci.yml`).
 
+## Tools & i18n (built)
+
+- Multi-page tools, each its own URL/SEO target: `/` (My IP), `/browser`, `/headers`,
+  `/webrtc` (WebRTC leak test), `/ipv6` (IPv6). `DNS` is `soon` (needs DNS-logging infra).
+- **Bilingual NL/EN** (`i18n.js`): auto from browser/OS language, toggle in the top bar
+  (language + theme buttons, right side), persisted in localStorage.
+- **IPv6 caveat:** the page reliably shows *how you reached the site* (v4/v6, from the
+  edge). The active capability probe needs **v4-only / v6-only hosts** (`ipv4.`/`ipv6.
+  whatsip.nl`); Cloudflare Pages domains are proxied dual-stack, so a true single-stack
+  host likely needs separate infra — until then the probe shows "unavailable" gracefully.
+
 ## Open items
 
 - [ ] Move `whatsip.nl` to a Cloudflare zone (status: "almost").
