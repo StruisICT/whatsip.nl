@@ -7,17 +7,17 @@ export const onRequest: PagesFunction = ({ request }) => {
   const sizeKB = Math.min(parseInt(url.searchParams.get("size") || "1000"), 10000); // Max 10MB
   const sizeBytes = sizeKB * 1024;
   
-  // Generate random data
-  // Using a simple repeating pattern is faster than true random
-  const chunk = "0123456789abcdef".repeat(64); // 1KB chunk
-  const chunks = Math.ceil(sizeBytes / 1024);
+  // Generate data efficiently using ArrayBuffer for large files
+  // Much faster than string concatenation for multi-MB responses
+  const buffer = new Uint8Array(sizeBytes);
   
-  let data = "";
-  for (let i = 0; i < chunks; i++) {
-    data += chunk;
+  // Fill with a repeating pattern (faster than random, sufficient for speed test)
+  const pattern = new TextEncoder().encode("0123456789abcdefghijklmnopqrstuvwxyz");
+  for (let i = 0; i < sizeBytes; i++) {
+    buffer[i] = pattern[i % pattern.length];
   }
   
-  return new Response(data.slice(0, sizeBytes), {
+  return new Response(buffer, {
     headers: {
       "Content-Type": "application/octet-stream",
       "Content-Length": sizeBytes.toString(),
