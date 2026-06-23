@@ -9,6 +9,54 @@ document.addEventListener("DOMContentLoaded", function () {
   var n=navigator, s=screen, conn=n.connection||n.mozConnection||n.webkitConnection||{};
   var uaD=n.userAgentData, tz=null;
   try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){}
+  
+  var realSpeed = null;
+  var speedTesting = false;
+  
+  function measureSpeed() {
+    if (speedTesting) return;
+    speedTesting = true;
+    
+    var testSizeKB = 2000; // 2MB test
+    var start = performance.now();
+    
+    fetch("/speedtest?size=" + testSizeKB + "&cache=" + Date.now(), { cache: "no-store" })
+      .then(function(res) { return res.blob(); })
+      .then(function(blob) {
+        var end = performance.now();
+        var durationSec = (end - start) / 1000;
+        var sizeMB = blob.size / (1024 * 1024);
+        var mbps = (sizeMB * 8) / durationSec;
+        
+        realSpeed = mbps.toFixed(1);
+        updateConnectionField();
+        speedTesting = false;
+      })
+      .catch(function(err) {
+        console.error("Speed test failed:", err);
+        speedTesting = false;
+        updateConnectionField();
+      });
+  }
+  
+  function updateConnectionField() {
+    var connField = document.querySelector('[data-field="connection"]');
+    if (!connField) return;
+    
+    var value = "";
+    if (realSpeed) {
+      value = "~" + realSpeed + " Mbps (measured)";
+    } else if (conn.effectiveType) {
+      value = conn.effectiveType.toUpperCase();
+      if (conn.downlink) value += " · browser est. ~" + conn.downlink + " Mbps";
+      if (conn.rtt) value += " · " + conn.rtt + " ms";
+      value += " (testing real speed...)";
+    } else {
+      value = "Testing...";
+    }
+    
+    connField.querySelector('.v').textContent = value;
+  }
 
   document.getElementById("grid").innerHTML=
     field(t("f.browser"),uaD&&uaD.brands?uaD.brands.map(function(b){return b.brand+" "+b.version;}).filter(function(x){return !/Not.?A.?Brand/i.test(x);}).join(", "):null)+
@@ -23,10 +71,14 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.memory"),n.deviceMemory?n.deviceMemory+" GB":null)+
     field(t("f.touch"),n.maxTouchPoints)+
     field(t("f.gpu"),gpu(),isFirefox?"Firefox may show outdated GPU info if your graphics card was upgraded. The WebGL cache isn't automatically refreshed. Click to open about:support for current hardware details.":null)+
-    field(t("f.conn"),conn.effectiveType?conn.effectiveType.toUpperCase()+(conn.downlink?" · ~"+conn.downlink+" Mbps":"")+(conn.rtt?" · "+conn.rtt+" ms":""):null)+
+    '<div class="field" data-field="connection"><div class="k">'+esc(t("f.conn"))+'</div><div class="v">Testing...</div></div>'+
     field(t("f.savedata"),conn.saveData?t("v.on"):null)+
     field(t("f.cookies"),yn(n.cookieEnabled))+
     field(t("f.dnt"),n.doNotTrack==="1"?t("v.on"):t("v.off"))+
     field(t("f.online"),yn(n.onLine))+
     field(t("f.ua"),n.userAgent);
+  
+  // Start speed test after rendering
+  updateConnectionField();
+  setTimeout(measureSpeed, 100);
 });
