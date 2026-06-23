@@ -7,7 +7,7 @@
     "build": "node scripts/build.mjs",
     "dev": "npm run build && wrangler pages dev dist",
     "typecheck": "tsc --noEmit",
-    "deploy": "npm run build && wrangler pages deploy dist"
+    "manual-deploy": "npm run build && wrangler pages deploy dist"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240620.0",
