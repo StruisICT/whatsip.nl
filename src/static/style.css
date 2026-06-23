@@ -87,8 +87,8 @@ details pre { margin: 0; padding: 0 1rem 1rem; overflow-x: auto; font-size: 0.85
 .tools { margin-top: 1.75rem; display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 .tool { display: block; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; }
 .tool:hover { border-color: var(--accent); }
-.tool .t { font-weight: 700; }
-.tool .d { color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+.tool .t { display: block; font-weight: 700; }
+.tool .d { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; line-height: 1.3; }
 .tool.soon { opacity: 0.6; pointer-events: none; }
 .tool.soon .t::after { content: " · soon"; color: var(--muted); font-weight: 600; font-size: 0.75rem; }
 
