@@ -17,16 +17,31 @@ document.addEventListener("DOMContentLoaded", function () {
     if (speedTesting) return;
     speedTesting = true;
     
-    var testSizeKB = 2000; // 2MB test
+    // Multi-stream test like speedtest.net - 4 parallel downloads of 5MB each
+    var streams = 4;
+    var sizePerStreamKB = 5000; // 5MB per stream
     var start = performance.now();
+    var totalBytes = 0;
+    var completed = 0;
     
-    fetch("/speedtest?size=" + testSizeKB + "&cache=" + Date.now(), { cache: "no-store" })
-      .then(function(res) { return res.blob(); })
-      .then(function(blob) {
+    var promises = [];
+    for (var i = 0; i < streams; i++) {
+      var promise = fetch("/speedtest?size=" + sizePerStreamKB + "&stream=" + i + "&cache=" + Date.now(), { cache: "no-store" })
+        .then(function(res) { return res.blob(); })
+        .then(function(blob) {
+          totalBytes += blob.size;
+          completed++;
+          return blob;
+        });
+      promises.push(promise);
+    }
+    
+    Promise.all(promises)
+      .then(function() {
         var end = performance.now();
         var durationSec = (end - start) / 1000;
-        var sizeMB = blob.size / (1024 * 1024);
-        var mbps = (sizeMB * 8) / durationSec;
+        var totalMB = totalBytes / (1024 * 1024);
+        var mbps = (totalMB * 8) / durationSec;
         
         realSpeed = mbps.toFixed(1);
         updateConnectionField();
