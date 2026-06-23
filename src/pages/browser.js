@@ -74,8 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.savedata"),conn.saveData?t("v.on"):null)+
     field(t("f.cookies"),yn(n.cookieEnabled))+
     field(t("f.dnt"),n.doNotTrack==="1"?t("v.on"):t("v.off"))+
-    field(t("f.online"),yn(n.onLine))+
-    field(t("f.ua"),n.userAgent);
+    field(t("f.online"),yn(n.onLine));
   
   // Start speed test after rendering
   updateConnectionField();
