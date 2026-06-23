@@ -13,6 +13,7 @@ const SRC = path.join(ROOT, "src");
 const DIST = path.join(ROOT, "dist");
 const ORIGIN = "https://whatsip.nl";
 const LANGS = ["en", "nl"];
+const BUILD_VERSION = Date.now();
 
 const STR = JSON.parse(fs.readFileSync(path.join(SRC, "strings.json"), "utf8"));
 
@@ -47,9 +48,9 @@ function head(lang, page) {
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/style.css" />
-  <script defer src="/i18n.js"></script>
-  <script defer src="/app.js"></script>
+  <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" />
+  <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
+  <script defer src="/app.js?v=${BUILD_VERSION}"></script>
 </head>`;
 }
 
