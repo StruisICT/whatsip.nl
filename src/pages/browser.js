@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
   var t = window.t || function (k) { return k; };
   function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
-  function field(k,v){if(v===null||v===undefined||v===""||v==="unknown")return"";return '<div class="field"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+"</div></div>";}
+  function field(k,v,info){if(v===null||v===undefined||v===""||v==="unknown")return"";var i=info?'<span class="info-icon" title="'+esc(info)+'">ⓘ</span>':'";return '<div class="field"><div class="k">'+esc(k)+i+'</div><div class="v">'+esc(v)+"</div></div>";}
+  var isFirefox=/Firefox\//.test(navigator.userAgent);
   function gpu(){try{var c=document.createElement("canvas");var gl=c.getContext("webgl")||c.getContext("experimental-webgl");if(!gl)return null;var i=gl.getExtension("WEBGL_debug_renderer_info");return i?gl.getParameter(i.UNMASKED_RENDERER_WEBGL):null;}catch(e){return null;}}
   function yn(b){return b?t("v.yes"):t("v.no");}
 
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.cores"),n.hardwareConcurrency)+
     field(t("f.memory"),n.deviceMemory?n.deviceMemory+" GB":null)+
     field(t("f.touch"),n.maxTouchPoints)+
-    field(t("f.gpu"),gpu())+
+    field(t("f.gpu"),gpu(),isFirefox?"Firefox may show cached GPU info. For accurate data, check about:support → Graphics section.":null)+
     field(t("f.conn"),conn.effectiveType?conn.effectiveType.toUpperCase()+(conn.downlink?" · ~"+conn.downlink+" Mbps":"")+(conn.rtt?" · "+conn.rtt+" ms":""):null)+
     field(t("f.savedata"),conn.saveData?t("v.on"):null)+
     field(t("f.cookies"),yn(n.cookieEnabled))+
