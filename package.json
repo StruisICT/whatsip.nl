@@ -7,10 +7,23 @@
     "build": "node scripts/build.mjs",
     "dev": "npm run build && wrangler pages dev dist",
     "typecheck": "tsc --noEmit",
-    "manual-deploy": "npm run build && wrangler pages deploy dist"
+    "manual-deploy": "npm run build && wrangler pages deploy dist",
+    "test": "npm run test:build && npm run test:html && npm run test:links && npm run test:api && npm run test:e2e && npm run test:a11y && npm run test:perf",
+    "test:build": "node tests/build-validation.mjs",
+    "test:html": "node tests/html-validation.mjs",
+    "test:links": "node tests/link-checker.mjs",
+    "test:api": "node tests/api-tests.mjs",
+    "test:e2e": "playwright test",
+    "test:a11y": "node tests/accessibility.mjs",
+    "test:perf": "node tests/performance.mjs",
+    "test:visual": "playwright test --project=visual"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.9.1",
     "@cloudflare/workers-types": "^4.20240620.0",
+    "@playwright/test": "^1.45.0",
+    "html-validate": "^8.20.1",
+    "lighthouse": "^12.2.0",
     "typescript": "^5.4.5",
     "wrangler": "^3.60.0"
   }
