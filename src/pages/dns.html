@@ -1,0 +1,20 @@
+<div class="page">
+  <h1>{{t:dns.title}}</h1>
+  <p class="intro">{{t:dns.desc}}</p>
+
+  <section class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.doh}}</h2>
+    <p id="doh-status" style="font-weight: 600;">{{t:dns.doh.checking}}</p>
+  </section>
+
+  <section class="card warn" style="margin-bottom: 1.5rem;">
+    <p style="margin: 0;"><strong>⚠️ {{t:dns.limitation}}</strong></p>
+  </section>
+
+  <section class="card" style="text-align: center;">
+    <p style="margin-bottom: 1rem;">For a complete DNS leak test, use a third-party service:</p>
+    <a href="https://www.dnsleaktest.com/" target="_blank" rel="noopener" class="btn">{{t:dns.external}}</a>
+  </section>
+</div>
+
+<script src="{{@dns}}"></script>
