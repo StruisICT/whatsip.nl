@@ -64,7 +64,6 @@ function nav(lang, slug) {
     <a class="brand" href="/${lang}/">whatsip<span>.nl</span></a>
     <nav class="tabs" aria-label="Tools">
       ${tabs}
-      <a class="soon" aria-disabled="true">${S["nav.dns"]}</a>
     </nav>
     <a class="theme-btn" href="/${other}/${slug}" aria-label="${attr(S["aria.lang"])}">${other.toUpperCase()}</a>
     <button class="theme-btn" id="theme" type="button" aria-label="${attr(S["aria.theme"])}">🌓</button>
