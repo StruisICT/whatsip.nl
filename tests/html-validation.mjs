@@ -33,20 +33,18 @@ console.log("Validating HTML files...\n");
 for (const lang of LANGS) {
   for (const page of PAGES) {
     const filePath = path.join(DIST, lang, page);
-    const html = fs.readFileSync(filePath, "utf8");
-    const report = htmlvalidate.validateString(html);
+    const report = htmlvalidate.validateFile(filePath);
 
     if (!report.valid) {
       console.log(`✗ /${lang}/${page}:`);
-      for (const result of report.results) {
-        for (const msg of result.messages) {
-          if (msg.severity === 2) {
-            console.log(`  ERROR: ${msg.message} (line ${msg.line}:${msg.column})`);
-            totalErrors++;
-          } else {
-            console.log(`  WARN: ${msg.message} (line ${msg.line}:${msg.column})`);
-            totalWarnings++;
-          }
+      const messages = report.results[0]?.messages || [];
+      for (const msg of messages) {
+        if (msg.severity === 2) {
+          console.log(`  ERROR: ${msg.message} (line ${msg.line}:${msg.column})`);
+          totalErrors++;
+        } else {
+          console.log(`  WARN: ${msg.message} (line ${msg.line}:${msg.column})`);
+          totalWarnings++;
         }
       }
     } else {
