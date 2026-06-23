@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ]);
   }
   // ipv4.whatsip.nl = A-only control, ipv6.whatsip.nl = AAAA-only probe.
-  // Until those DNS records exist (zone pending), control fails -> "unavailable".
+  // These subdomains need DNS records: ipv4 (A only), ipv6 (AAAA only)
   Promise.all([probe("ipv4.whatsip.nl"),probe("ipv6.whatsip.nl")]).then(function(r){
     var control=r[0], v6=r[1];
     if(!control){capEl.textContent=t("v6.unavail");capEl.className="status-line";}

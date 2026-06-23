@@ -5,14 +5,17 @@
   <section class="card" style="margin-bottom: 1.5rem;">
     <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.doh}}</h2>
     <p id="doh-status" style="font-weight: 600;">{{t:dns.doh.checking}}</p>
+    <p id="doh-detail" style="font-size: 0.9rem; color: var(--muted); margin-top: 0.5rem;"></p>
   </section>
 
-  <section class="card warn" style="margin-bottom: 1.5rem;">
-    <p style="margin: 0;"><strong>⚠️ {{t:dns.limitation}}</strong></p>
+  <section class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.resolver}}</h2>
+    <p id="resolver-status" style="font-weight: 600;">{{t:dns.resolver.checking}}</p>
+    <div id="resolver-list" style="margin-top: 1rem;"></div>
   </section>
 
   <section class="card" style="text-align: center;">
-    <p style="margin-bottom: 1rem;">For a complete DNS leak test, use a third-party service:</p>
+    <p style="margin-bottom: 1rem;">{{t:dns.external.note}}</p>
     <a href="https://www.dnsleaktest.com/" target="_blank" rel="noopener" class="btn">{{t:dns.external}}</a>
   </section>
 </div>
