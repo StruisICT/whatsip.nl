@@ -17,37 +17,80 @@ document.addEventListener("DOMContentLoaded", function () {
     if (speedTesting) return;
     speedTesting = true;
     
-    // Multi-stream test like speedtest.net - 16 parallel downloads of 15MB each
-    var streams = 16;
-    var sizePerStreamKB = 15000; // 15MB per stream = 240MB total
-    var start = performance.now();
-    var totalBytes = 0;
-    var completed = 0;
+    // Aggressive multi-stream test with warm-up and peak measurement
+    var streams = 32; // More streams = better saturation
+    var sizePerStreamKB = 20000; // 20MB per stream = 640MB total
+    var warmupMs = 3000; // Ignore first 3 seconds (TCP slow start)
+    
+    var startTime = performance.now();
+    var bytesReceived = 0;
+    var peakSpeed = 0;
+    var lastMeasure = startTime;
+    var lastBytes = 0;
+    
+    // Track bytes received in real-time to calculate peak speed
+    var checkInterval = setInterval(function() {
+      var now = performance.now();
+      var elapsed = (now - lastMeasure) / 1000;
+      
+      if (elapsed >= 1.0 && (now - startTime) > warmupMs) {
+        // Measure speed over last second
+        var newBytes = bytesReceived - lastBytes;
+        var mbps = (newBytes * 8) / (1024 * 1024 * elapsed);
+        
+        if (mbps > peakSpeed) peakSpeed = mbps;
+        
+        lastMeasure = now;
+        lastBytes = bytesReceived;
+      }
+    }, 500); // Check twice per second
     
     var promises = [];
     for (var i = 0; i < streams; i++) {
-      var promise = fetch("/speedtest?size=" + sizePerStreamKB + "&stream=" + i + "&cache=" + Date.now(), { cache: "no-store" })
-        .then(function(res) { return res.blob(); })
-        .then(function(blob) {
-          totalBytes += blob.size;
-          completed++;
-          return blob;
+      var promise = fetch("/speedtest?size=" + sizePerStreamKB + "&s=" + i + "&c=" + Date.now(), { cache: "no-store" })
+        .then(function(res) {
+          // Use Response.body stream to track progress
+          var reader = res.body.getReader();
+          var chunks = [];
+          
+          function readChunk() {
+            return reader.read().then(function(result) {
+              if (result.done) {
+                return new Blob(chunks);
+              }
+              chunks.push(result.value);
+              bytesReceived += result.value.length;
+              return readChunk();
+            });
+          }
+          
+          return readChunk();
         });
       promises.push(promise);
     }
     
     Promise.all(promises)
       .then(function() {
-        var end = performance.now();
-        var durationSec = (end - start) / 1000;
-        var totalMB = totalBytes / (1024 * 1024);
-        var mbps = (totalMB * 8) / durationSec;
+        clearInterval(checkInterval);
         
-        realSpeed = mbps.toFixed(1);
+        var end = performance.now();
+        var totalDuration = (end - startTime) / 1000;
+        var effectiveDuration = totalDuration - (warmupMs / 1000);
+        
+        // Use peak speed if we measured it, otherwise fall back to average
+        if (peakSpeed > 0) {
+          realSpeed = peakSpeed.toFixed(1);
+        } else {
+          var totalMB = bytesReceived / (1024 * 1024);
+          var mbps = (totalMB * 8) / totalDuration;
+          realSpeed = mbps.toFixed(1);
+        }
+        
         updateConnectionField();
         speedTesting = false;
       })
       .catch(function(err) {
+        clearInterval(checkInterval);
         console.error("Speed test failed:", err);
         speedTesting = false;
         updateConnectionField();
@@ -60,14 +103,14 @@ document.addEventListener("DOMContentLoaded", function () {
     
     var value = "";
     if (realSpeed) {
-      value = "~" + realSpeed + " Mbps (measured)";
+      value = "~" + realSpeed + " Mbps (peak measured)";
     } else if (conn.effectiveType) {
       value = conn.effectiveType.toUpperCase();
       if (conn.downlink) value += " · browser est. ~" + conn.downlink + " Mbps";
       if (conn.rtt) value += " · " + conn.rtt + " ms";
-      value += " (testing real speed...)";
+      value += " (measuring 640MB download...)";
     } else {
-      value = "Testing...";
+      value = "Measuring speed...";
     }
     
     connField.querySelector('.v').textContent = value;

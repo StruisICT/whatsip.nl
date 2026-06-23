@@ -4,7 +4,7 @@
  */
 export const onRequest: PagesFunction = ({ request }) => {
   const url = new URL(request.url);
-  const sizeKB = Math.min(parseInt(url.searchParams.get("size") || "1000"), 20000); // Max 20MB per stream
+  const sizeKB = Math.min(parseInt(url.searchParams.get("size") || "1000"), 25000); // Max 25MB per stream
   const sizeBytes = sizeKB * 1024;
   
   // Generate data efficiently using ArrayBuffer for large files
