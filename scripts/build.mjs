@@ -122,6 +122,27 @@ ${urls}
 `;
 }
 
+// ---- pre-build validation ----
+import { execSync } from "node:child_process";
+
+function validateJavaScript() {
+  const jsFiles = fs.readdirSync(path.join(SRC, "pages"))
+    .filter(f => f.endsWith(".js"))
+    .map(f => path.join(SRC, "pages", f));
+  
+  for (const file of jsFiles) {
+    try {
+      execSync(`node --check "${file}"`, { encoding: "utf8", stdio: "pipe" });
+    } catch (err) {
+      console.error(`\n❌ JavaScript syntax error in ${path.basename(file)}:\n`);
+      console.error(err.stderr || err.message);
+      process.exit(1);
+    }
+  }
+}
+
+validateJavaScript();
+
 // ---- build ----
 fs.rmSync(DIST, { recursive: true, force: true });
 for (const lang of LANGS) {
