@@ -17,9 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (speedTesting) return;
     speedTesting = true;
     
-    // Multi-stream test like speedtest.net - 8 parallel downloads of 10MB each
-    var streams = 8;
-    var sizePerStreamKB = 10000; // 10MB per stream = 80MB total
+    // Multi-stream test like speedtest.net - 16 parallel downloads of 15MB each
+    var streams = 16;
+    var sizePerStreamKB = 15000; // 15MB per stream = 240MB total
     var start = performance.now();
     var totalBytes = 0;
     var completed = 0;
