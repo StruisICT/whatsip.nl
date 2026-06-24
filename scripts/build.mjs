@@ -62,13 +62,11 @@ function head(lang, page) {
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
   <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
-  <style>body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg,#fff);color:var(--fg,#0b0f14)}:root{color-scheme:light dark}[data-theme=dark]{--bg:#0b0f14;--fg:#e5e7eb;--card:#1a1f28;--accent:#6366f1}[data-theme=light]{--bg:#ffffff;--fg:#0b0f14;--card:#f9fafb;--accent:#4f46e5}</style>
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" /></noscript>
+  <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" />
   <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
   <script defer src="/app.js?v=${BUILD_VERSION}"></script>
 </head>`;
