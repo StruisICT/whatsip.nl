@@ -17,11 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (speedTesting) return;
     speedTesting = true;
     
-    // Multi-edge test: hit different subdomains (different Cloudflare edges)
-    var testDomains = ['test1', 'test2', 'test3', 'test4', 'test5'];
-    var streamsPerDomain = 8; // 8 streams per domain
-    var streams = testDomains.length * streamsPerDomain; // 40 total
-    var sizePerStreamKB = 25000; // 25MB per stream
+    // Aggressive multi-stream test with warm-up and peak measurement
+    var streams = 32; // More streams = better saturation
+    var sizePerStreamKB = 20000; // 20MB per stream = 640MB total
     var warmupMs = 3000; // Ignore first 3 seconds (TCP slow start)
     
     var startTime = performance.now();
@@ -48,14 +46,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500); // Check twice per second
     
     var promises = [];
-    var streamIndex = 0;
-    for (var d = 0; d < testDomains.length; d++) {
-      var domain = testDomains[d];
-      for (var s = 0; s < streamsPerDomain; s++) {
-        var url = "https://" + domain + ".whatsip.nl/speedtest?size=" + sizePerStreamKB + "&i=" + streamIndex + "&c=" + Date.now();
-        streamIndex++;
-        
-        var promise = fetch(url, { cache: "no-store" })
+    for (var i = 0; i < streams; i++) {
+      var promise = fetch("/speedtest?size=" + sizePerStreamKB + "&s=" + i + "&c=" + Date.now(), { cache: "no-store" })
         .then(function(res) {
           // Use Response.body stream to track progress
           var reader = res.body.getReader();
@@ -75,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
           return readChunk();
         });
       promises.push(promise);
-      }
     }
     
     Promise.all(promises)
@@ -113,11 +104,14 @@ document.addEventListener("DOMContentLoaded", function () {
     var value = "";
     if (realSpeed) {
       value = "~" + realSpeed + " Mbps (peak measured)";
+      if (parseFloat(realSpeed) >= 500) {
+        value += " • browser limit ~550 Mbps";
+      }
     } else if (conn.effectiveType) {
       value = conn.effectiveType.toUpperCase();
       if (conn.downlink) value += " · browser est. ~" + conn.downlink + " Mbps";
       if (conn.rtt) value += " · " + conn.rtt + " ms";
-      value += " (testing 1GB across 5 edges...)";
+      value += " (measuring 640MB download...)";
     } else {
       value = "Measuring speed...";
     }
