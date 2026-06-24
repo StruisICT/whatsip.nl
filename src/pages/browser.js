@@ -17,9 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (speedTesting) return;
     speedTesting = true;
     
-    // Aggressive multi-stream test with warm-up and peak measurement
-    var streams = 32; // More streams = better saturation
-    var sizePerStreamKB = 20000; // 20MB per stream = 640MB total
+    // Multi-edge test: hit different subdomains (different Cloudflare edges)
+    var testDomains = ['test1', 'test2', 'test3', 'test4', 'test5'];
+    var streamsPerDomain = 8; // 8 streams per domain
+    var streams = testDomains.length * streamsPerDomain; // 40 total
+    var sizePerStreamKB = 25000; // 25MB per stream
     var warmupMs = 3000; // Ignore first 3 seconds (TCP slow start)
     
     var startTime = performance.now();
@@ -46,8 +48,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500); // Check twice per second
     
     var promises = [];
-    for (var i = 0; i < streams; i++) {
-      var promise = fetch("/speedtest?size=" + sizePerStreamKB + "&s=" + i + "&c=" + Date.now(), { cache: "no-store" })
+    var streamIndex = 0;
+    for (var d = 0; d < testDomains.length; d++) {
+      var domain = testDomains[d];
+      for (var s = 0; s < streamsPerDomain; s++) {
+        var url = "https://" + domain + ".whatsip.nl/speedtest?size=" + sizePerStreamKB + "&i=" + streamIndex + "&c=" + Date.now();
+        streamIndex++;
+        
+        var promise = fetch(url, { cache: "no-store" })
         .then(function(res) {
           // Use Response.body stream to track progress
           var reader = res.body.getReader();
@@ -67,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return readChunk();
         });
       promises.push(promise);
+      }
     }
     
     Promise.all(promises)
@@ -108,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
       value = conn.effectiveType.toUpperCase();
       if (conn.downlink) value += " · browser est. ~" + conn.downlink + " Mbps";
       if (conn.rtt) value += " · " + conn.rtt + " ms";
-      value += " (measuring 640MB download...)";
+      value += " (testing 1GB across 5 edges...)";
     } else {
       value = "Measuring speed...";
     }
@@ -134,7 +143,45 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.dnt"),n.doNotTrack==="1"?t("v.on"):t("v.off"))+
     field(t("f.online"),yn(n.onLine));
   
-  // Start speed test after rendering
+  // Try upload test first (often less throttled), then download
+  function measureUploadSpeed() {
+    // Generate 20MB of data to upload
+    var sizeMB = 20;
+    var data = new Uint8Array(sizeMB * 1024 * 1024);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = i % 256;
+    }
+    
+    var start = performance.now();
+    
+    fetch("/speedtest-upload", {
+      method: "POST",
+      body: data,
+      cache: "no-store"
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(result) {
+        var end = performance.now();
+        var durationSec = (end - start) / 1000;
+        var mbps = (sizeMB * 8) / durationSec;
+        
+        // If upload is significantly better, use it
+        if (mbps > (realSpeed || 0)) {
+          realSpeed = mbps.toFixed(1);
+          updateConnectionField();
+        }
+        
+        // Then try download test
+        setTimeout(measureSpeed, 1000);
+      })
+      .catch(function(err) {
+        console.error("Upload test failed:", err);
+        // Fall back to download test
+        setTimeout(measureSpeed, 1000);
+      });
+  }
+  
+  // Start with upload test
   updateConnectionField();
-  setTimeout(measureSpeed, 100);
+  setTimeout(measureUploadSpeed, 100);
 });
