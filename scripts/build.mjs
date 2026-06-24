@@ -67,6 +67,19 @@ function head(lang, page) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "whatsip.nl - IP Address Checker",
+    "url": "${ORIGIN}",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "description": "${attr(S[page.desc])}",
+    "offers": {"@type": "Offer", "price": "0"},
+    "inLanguage": ["en", "nl"]
+  }
+  </script>
   <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
   <script defer src="/app.js?v=${BUILD_VERSION}"></script>
 </head>`;
