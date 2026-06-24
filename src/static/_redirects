@@ -2,3 +2,6 @@
 # Root (/) is handled by functions/index.ts (Accept-Language -> /en/ or /nl/).
 # Static pages (/en/*, /nl/*) and functions (/ip, /api/*) are served directly.
 # No catch-all needed with the localized structure.
+
+# Redirect www to apex domain (must configure www.whatsip.nl as custom domain in Cloudflare Pages)
+https://www.whatsip.nl/* https://whatsip.nl/:splat 301
