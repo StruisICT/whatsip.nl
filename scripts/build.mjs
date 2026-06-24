@@ -128,11 +128,12 @@ function clientI18n() {
 }
 
 function sitemap() {
+  const lastmod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const alts = (slug) =>
     LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${ORIGIN}/${l}/${slug}"/>`).join("") +
     `<xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}/en/${slug}"/>`;
   const urls = PAGES.flatMap((p) =>
-    LANGS.map((l) => `  <url><loc>${ORIGIN}/${l}/${p.slug}</loc>${alts(p.slug)}</url>`),
+    LANGS.map((l) => `  <url><loc>${ORIGIN}/${l}/${p.slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>${p.slug === '' ? '1.0' : '0.8'}</priority>${alts(p.slug)}</url>`),
   ).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
