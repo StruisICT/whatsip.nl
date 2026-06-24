@@ -25,26 +25,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Test LocalStorage
   var localStorageTest = "unknown";
-  var localStorageSize = 0;
   try {
     localStorage.setItem("test", "1");
     localStorage.removeItem("test");
     localStorageTest = "Available";
-    // Estimate quota
-    var testStr = new Array(1024).join("a"); // 1KB
-    var i = 0;
-    while (i < 10000) { // Test up to ~10MB
-      try {
-        localStorage.setItem("sizeTest", testStr.repeat(i));
-        i++;
-      } catch (e) {
-        localStorageSize = i - 1;
-        break;
-      }
-    }
-    localStorage.removeItem("sizeTest");
   } catch (e) {
     localStorageTest = "Blocked/Disabled";
+  }
+
+  // Storage quota via the modern, instant API (no slow write loop)
+  var quotaText = "";
+  if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(function (est) {
+      if (est && est.quota) {
+        var quotaMB = (est.quota / (1024 * 1024)).toFixed(0);
+        var usedMB = ((est.usage || 0) / (1024 * 1024)).toFixed(1);
+        quotaText = "~" + quotaMB + " MB total (" + usedMB + " MB used)";
+        renderResults();
+      }
+    }).catch(function () {});
   }
 
   // Test SessionStorage
@@ -88,9 +87,10 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderResults() {
     document.getElementById("grid").innerHTML =
       field(t("storage.cookies"), cookieTest, cookiesEnabled ? "yes" : "no") +
-      field(t("storage.localStorage"), localStorageTest + (localStorageSize > 0 ? " (~" + localStorageSize + " KB quota)" : ""), localStorageTest === "Available" ? "yes" : "no") +
+      field(t("storage.localStorage"), localStorageTest, localStorageTest === "Available" ? "yes" : "no") +
       field(t("storage.sessionStorage"), sessionStorageTest, sessionStorageTest === "Available" ? "yes" : "no") +
       field(t("storage.indexedDB"), indexedDBTest, indexedDBTest === "Available" ? "yes" : "no") +
+      field(t("storage.quota"), quotaText) +
       field(t("storage.dnt"), dntStatus, dnt === "1" ? "yes" : null) +
       field(t("storage.cookieCount"), document.cookie.split(";").filter(Boolean).length + " cookies") +
       "";
