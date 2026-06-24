@@ -129,7 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.viewport"),window.innerWidth+"×"+window.innerHeight)+
     field(t("f.dpr"),window.devicePixelRatio)+
     field(t("f.cores"),n.hardwareConcurrency)+
-    field(t("f.memory"),n.deviceMemory?n.deviceMemory+" GB":null)+
     field(t("f.gpu"),gpu(),isFirefox?"Firefox may show outdated GPU info if your graphics card was upgraded. The WebGL cache isn't automatically refreshed. Click to open about:support for current hardware details.":null)+
     '<div class="field" data-field="connection"><div class="k">'+esc(t("f.conn"))+'</div><div class="v">Testing...</div></div>'+
     field(t("f.savedata"),conn.saveData?t("v.on"):null)+

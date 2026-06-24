@@ -21,5 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function copy(){window.whatsipCopy(d.ip||"",btn);}
     btn.addEventListener("click",copy);
     ipEl.addEventListener("click",copy);
-  }).catch(function(){document.getElementById("ip").textContent=t("err.ip");});
+  }).catch(function(err){
+    console.error("Failed to load IP info:", err);
+    var ipEl=document.getElementById("ip");
+    ipEl.textContent=t("err.ip");
+    ipEl.style.color="#ef4444";
+  });
 });

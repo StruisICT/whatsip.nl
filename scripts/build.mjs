@@ -46,8 +46,21 @@ function head(lang, page) {
   <link rel="alternate" hreflang="x-default" href="${url("en")}" />
   <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="${url(lang)}" />
+  <meta property="og:title" content="${attr(S[page.title])}" />
+  <meta property="og:description" content="${attr(S[page.desc])}" />
+  <meta property="og:image" content="${ORIGIN}/favicon.svg" />
+  <meta property="og:site_name" content="whatsip.nl" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:url" content="${url(lang)}" />
+  <meta name="twitter:title" content="${attr(S[page.title])}" />
+  <meta name="twitter:description" content="${attr(S[page.desc])}" />
+  <meta name="twitter:image" content="${ORIGIN}/favicon.svg" />
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" />
   <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
   <script defer src="/app.js?v=${BUILD_VERSION}"></script>

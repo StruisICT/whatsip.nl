@@ -9,5 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var btn=document.getElementById("copy");
     btn.disabled=false;
     btn.addEventListener("click",function(){window.whatsipCopy(JSON.stringify(h,null,2),btn);});
-  }).catch(function(){document.getElementById("grid").innerHTML='<p class="label">'+t("err.headers")+"</p>";});
+  }).catch(function(err){
+    console.error("Failed to load headers:", err);
+    document.getElementById("grid").innerHTML='<p class="label" style="color:#ef4444">'+t("err.headers")+"</p>";
+  });
 });
