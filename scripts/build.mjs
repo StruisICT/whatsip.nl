@@ -25,6 +25,8 @@ const PAGES = [
   { slug: "webrtc", out: "webrtc.html", title: "title.webrtc", desc: "desc.webrtc", frag: "webrtc", script: "webrtc", nav: "nav.webrtc" },
   { slug: "ipv6", out: "ipv6.html", title: "title.ipv6", desc: "desc.ipv6", frag: "ipv6", script: "ipv6", nav: "nav.ipv6" },
   { slug: "dns", out: "dns.html", title: "title.dns", desc: "desc.dns", frag: "dns", script: "dns", nav: "nav.dns" },
+  { slug: "storage", out: "storage.html", title: "storage.title", desc: "storage.intro", frag: "storage", script: "storage", nav: "nav.storage" },
+  { slug: "geolocation", out: "geolocation.html", title: "geo.title", desc: "geo.intro", frag: "geolocation", script: "geolocation", nav: "nav.geo" },
   { slug: "privacy", out: "privacy.html", title: "title.privacy", desc: "desc.privacy", frag: "privacy", script: null, nav: null },
 ];
 const NAV = PAGES.filter((p) => p.nav);
@@ -57,6 +59,9 @@ function head(lang, page) {
   <meta name="twitter:title" content="${attr(S[page.title])}" />
   <meta name="twitter:description" content="${attr(S[page.desc])}" />
   <meta name="twitter:image" content="${ORIGIN}/favicon.svg" />
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
