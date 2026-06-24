@@ -96,6 +96,13 @@ details pre { margin: 0; padding: 0 1rem 1rem; overflow-x: auto; font-size: 0.85
 .tool.soon { opacity: 0.6; pointer-events: none; }
 .tool.soon .t::after { content: " · soon"; color: var(--muted); font-weight: 600; font-size: 0.75rem; }
 
+/* ---- Explainer: calm educational text below each tool ---- */
+.explainer { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); line-height: 1.65; }
+.explainer h2 { font-size: 1.15rem; color: var(--text); margin: 0 0 0.75rem; }
+.explainer h3 { font-size: 1rem; color: var(--text); margin: 1.25rem 0 0.5rem; }
+.explainer p { margin: 0 0 0.85rem; font-size: 0.95rem; }
+.explainer p:last-child { margin-bottom: 0; }
+
 .status-ok { color: var(--accent); font-weight: 700; }
 .status-warn { color: var(--warn); font-weight: 700; }
 .status-line { font-size: 1.05rem; margin: 0; }
