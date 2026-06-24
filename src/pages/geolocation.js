@@ -13,7 +13,22 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
+  // Check current permission state
+  if (navigator.permissions) {
+    navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+      if (result.state === 'granted') {
+        grid.innerHTML = '<p class="label">✓ Location already allowed. Click to test.</p>';
+      } else if (result.state === 'denied') {
+        grid.innerHTML = '<p class="label" style="color:#ef4444">✗ Location blocked. Enable in browser settings.</p>';
+      } else {
+        grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
+      }
+    }).catch(function() {
+      grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
+    });
+  } else {
+    grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
+  }
 
   btn.addEventListener("click", function() {
     btn.disabled = true;
