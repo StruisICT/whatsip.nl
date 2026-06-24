@@ -1,4 +1,15 @@
-// Shared across every page (cached once). Theme toggle: auto -> light -> dark.
+// Shared across every page (cached once). Service worker, theme toggle, copy helper.
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function(err) {
+      console.log('ServiceWorker registration failed:', err);
+    });
+  });
+}
+
+// Theme toggle: auto -> light -> dark
 (function () {
   var root = document.documentElement;
   var saved = localStorage.getItem("theme");
