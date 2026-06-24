@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var uaD=n.userAgentData, tz=null;
   try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){}
   
-  var realSpeed = null;
-  var speedTesting = false;
-  
   function measureSpeed() {
     if (speedTesting) return;
     speedTesting = true;
@@ -126,55 +123,13 @@ document.addEventListener("DOMContentLoaded", function () {
     field(t("f.languages"),(n.languages||[n.language]).join(", "))+
     field(t("f.timezone"),tz)+
     field(t("f.screen"),s.width+"×"+s.height+" ("+s.colorDepth+"-bit)")+
-    field(t("f.viewport"),window.innerWidth+"×"+window.innerHeight)+
-    field(t("f.dpr"),window.devicePixelRatio)+
     field(t("f.cores"),n.hardwareConcurrency)+
     field(t("f.gpu"),gpu(),isFirefox?"Firefox may show outdated GPU info if your graphics card was upgraded. The WebGL cache isn't automatically refreshed. Click to open about:support for current hardware details.":null)+
-    '<div class="field" data-field="connection"><div class="k">'+esc(t("f.conn"))+'</div><div class="v">Testing...</div></div>'+
+    field(t("f.conn"),conn.effectiveType?conn.effectiveType.toUpperCase()+(conn.downlink?" · ~"+conn.downlink+" Mbps":"")+(conn.rtt?" · "+conn.rtt+" ms":""):null)+
     field(t("f.savedata"),conn.saveData?t("v.on"):null)+
     field(t("f.cookies"),yn(n.cookieEnabled))+
     field(t("f.dnt"),n.doNotTrack==="1"?t("v.on"):t("v.off"))+
     field(t("f.online"),yn(n.onLine));
   
-  // Try upload test first (often less throttled), then download
-  function measureUploadSpeed() {
-    // Generate 20MB of data to upload
-    var sizeMB = 20;
-    var data = new Uint8Array(sizeMB * 1024 * 1024);
-    for (var i = 0; i < data.length; i++) {
-      data[i] = i % 256;
-    }
-    
-    var start = performance.now();
-    
-    fetch("/speedtest-upload", {
-      method: "POST",
-      body: data,
-      cache: "no-store"
-    })
-      .then(function(res) { return res.json(); })
-      .then(function(result) {
-        var end = performance.now();
-        var durationSec = (end - start) / 1000;
-        var mbps = (sizeMB * 8) / durationSec;
-        
-        // If upload is significantly better, use it
-        if (mbps > (realSpeed || 0)) {
-          realSpeed = mbps.toFixed(1);
-          updateConnectionField();
-        }
-        
-        // Then try download test
-        setTimeout(measureSpeed, 1000);
-      })
-      .catch(function(err) {
-        console.error("Upload test failed:", err);
-        // Fall back to download test
-        setTimeout(measureSpeed, 1000);
-      });
-  }
-  
-  // Start with upload test
-  updateConnectionField();
-  setTimeout(measureUploadSpeed, 100);
+
 });
