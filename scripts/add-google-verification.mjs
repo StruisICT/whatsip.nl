@@ -6,7 +6,7 @@
  */
 import https from 'node:https';
 
-const ZONE_ID = '87faebac11f3bffdb78981c07a62bb3d'; // whatsip.nl zone
+const ZONE_ID = '4e0018cc99e8b56fe2133a41d463d829'; // whatsip.nl zone
 const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN2; // DNS edit token
 
 const verificationCode = process.argv[2];
