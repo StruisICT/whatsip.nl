@@ -3,16 +3,20 @@
   <p class="intro">{{t:dns.desc}}</p>
 
   <section class="card" style="margin-bottom: 1.5rem;">
-    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.leak.test}}</h2>
-    <p id="leak-status" style="font-weight: 600;">{{t:dns.leak.running}}</p>
-    <div id="leak-results" style="margin-top: 1rem;"></div>
-    <button id="retest-btn" class="btn" style="margin-top: 1rem; display: none;">{{t:dns.leak.retest}}</button>
+    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.ext.h}}</h2>
+    <p style="margin-bottom: 1rem;">{{t:dns.ext.p}}</p>
+    <a href="https://www.dnsleaktest.com/" target="_blank" rel="noopener" class="btn" style="text-decoration:none;display:inline-block;">{{t:dns.ext.button}} ↗</a>
+    <p style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--muted);">{{t:dns.ext.alt}} <a href="https://browserleaks.com/dns" target="_blank" rel="noopener">browserleaks.com/dns ↗</a></p>
   </section>
 
   <section class="card" style="margin-bottom: 1.5rem;">
-    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.doh}}</h2>
-    <p id="doh-status" style="font-weight: 600;">{{t:dns.doh.checking}}</p>
-    <p id="doh-detail" style="font-size: 0.9rem; color: var(--muted); margin-top: 0.5rem;"></p>
+    <h2 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{t:dns.doh.h}}</h2>
+    <p style="margin-bottom: 0.75rem;">{{t:dns.doh.p}}</p>
+    <ul style="margin: 0; padding-left: 1.25rem; line-height: 1.7; color: var(--muted); font-size: 0.95rem;">
+      <li>{{t:dns.doh.firefox}}</li>
+      <li>{{t:dns.doh.chrome}}</li>
+      <li>{{t:dns.doh.edge}}</li>
+    </ul>
   </section>
 
   <section class="explainer">
@@ -23,5 +27,3 @@
     <p>{{t:dns.about.p3}}</p>
   </section>
 </div>
-
-<script src="{{@dns}}"></script>
