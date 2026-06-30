@@ -20,6 +20,12 @@
 /app.js
   Cache-Control: public, max-age=86400
 
+/i18n.en.js
+  Cache-Control: public, max-age=86400
+
+/i18n.nl.js
+  Cache-Control: public, max-age=86400
+
 /ads.txt
   Cache-Control: public, max-age=86400
 

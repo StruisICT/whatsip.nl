@@ -84,7 +84,7 @@ function head(lang, page) {
     "inLanguage": ["en", "nl"]
   }
   </script>
-  <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
+  <script defer src="/i18n.${lang}.js?v=${BUILD_VERSION}"></script>
   <script defer src="/app.js?v=${BUILD_VERSION}"></script>
 </head>`;
 }
@@ -133,15 +133,33 @@ ${head(lang, page)}
 `;
 }
 
-function clientI18n() {
+function clientI18n(lang) {
+  // Per-language bundle: a page loads only its own strings (half the payload).
+  // Safe because build-time parity check guarantees all languages share keys.
   return `(function(){
-  var T = ${JSON.stringify(STR)};
-  var lang = document.documentElement.getAttribute("lang") || "en";
-  if (!T[lang]) lang = "en";
-  window.getLang = function(){ return lang; };
-  window.t = function(k){ return (T[lang] && T[lang][k]) || T.en[k] || k; };
+  var T = ${JSON.stringify(STR[lang])};
+  window.getLang = function(){ return ${JSON.stringify(lang)}; };
+  window.t = function(k){ return (T[k] != null ? T[k] : k); };
 })();
 `;
+}
+
+// Guarantee every language defines exactly the same keys, so per-language
+// i18n bundles never miss a runtime label.
+function assertStringParity() {
+  const ref = Object.keys(STR.en).sort();
+  for (const lang of LANGS) {
+    if (lang === "en") continue;
+    const keys = Object.keys(STR[lang]).sort();
+    const missing = ref.filter((k) => !(k in STR[lang]));
+    const extra = keys.filter((k) => !(k in STR.en));
+    if (missing.length || extra.length) {
+      console.error(`\u274c i18n parity error for "${lang}":`);
+      if (missing.length) console.error(`   missing: ${missing.join(", ")}`);
+      if (extra.length) console.error(`   extra:   ${extra.join(", ")}`);
+      process.exit(1);
+    }
+  }
 }
 
 function sitemap() {
@@ -188,7 +206,10 @@ for (const lang of LANGS) {
     fs.writeFileSync(path.join(DIST, lang, page.out), renderPage(lang, page));
   }
 }
-fs.writeFileSync(path.join(DIST, "i18n.js"), clientI18n());
+assertStringParity();
+for (const lang of LANGS) {
+  fs.writeFileSync(path.join(DIST, `i18n.${lang}.js`), clientI18n(lang));
+}
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap());
 
 // Copy shared static assets verbatim.
@@ -197,4 +218,4 @@ for (const f of fs.readdirSync(path.join(SRC, "static"))) {
 }
 
 const pages = PAGES.length * LANGS.length;
-console.log(`Built ${pages} pages -> dist/ (en, nl) + i18n.js, sitemap.xml, static assets.`);
+console.log(`Built ${pages} pages -> dist/ (en, nl) + i18n.<lang>.js, sitemap.xml, static assets.`);
