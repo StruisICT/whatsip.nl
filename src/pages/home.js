@@ -23,6 +23,14 @@ document.addEventListener("DOMContentLoaded", function () {
     ping(5);
   }
 
+  // Honest heuristic: if the browser's own timezone differs from the timezone
+  // implied by the IP's location, the user may be on a VPN/proxy.
+  function vpnHint(ipTz){
+    var btz="";try{btz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";}catch(e){}
+    if(!btz||!ipTz) return null;
+    return btz===ipTz ? t("vpn.none") : t("vpn.maybe")+" ("+btz+" ≠ "+ipTz+")";
+  }
+
   fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
     var ipEl=document.getElementById("ip");
     ipEl.textContent=d.ip||"unknown";
@@ -34,7 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
       field(t("f.rdns"),d.reverseDns)+
       '<div class="field" data-field="latency"><div class="k">'+esc(t("f.latency"))+'</div><div class="v">…</div></div>'+
       field(t("f.connection"),[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "))+
-      field(t("f.timezone"),d.timezone);
+      field(t("f.timezone"),d.timezone)+
+      field(t("f.vpnhint"),vpnHint(d.timezone));
 
     var btn=document.getElementById("copy");
     btn.disabled=false;

@@ -27,6 +27,8 @@ const PAGES = [
   { slug: "dns", out: "dns.html", title: "title.dns", desc: "desc.dns", frag: "dns", script: null, nav: "nav.dns" },
   { slug: "storage", out: "storage.html", title: "storage.title", desc: "storage.intro", frag: "storage", script: "storage", nav: "nav.storage" },
   { slug: "geolocation", out: "geolocation.html", title: "geo.title", desc: "geo.intro", frag: "geolocation", script: "geolocation", nav: "nav.geo" },
+  { slug: "permissions", out: "permissions.html", title: "perm.title", desc: "perm.intro", frag: "permissions", script: "permissions", nav: "nav.perm" },
+  { slug: "api", out: "api.html", title: "api.title", desc: "api.intro", frag: "api", script: null, nav: null },
   { slug: "faq", out: "faq.html", title: "faq.title", desc: "faq.intro", frag: "faq", script: null, nav: null },
   { slug: "about", out: "about.html", title: "about.title", desc: "about.intro", frag: "about", script: null, nav: null },
   { slug: "privacy", out: "privacy.html", title: "title.privacy", desc: "desc.privacy", frag: "privacy", script: null, nav: null },
@@ -107,7 +109,7 @@ function nav(lang, slug) {
 function footer(lang, slug) {
   const S = STR[lang];
   const note = slug === "" ? S["footer.privacyNote"] : S["footer.note"];
-  return `<footer><span>${note}</span> &nbsp;·&nbsp; <a href="/${lang}/faq">${S["footer.faq"]}</a> &nbsp;·&nbsp; <a href="/${lang}/about">${S["footer.about"]}</a> &nbsp;·&nbsp; <a href="/${lang}/privacy">${S["footer.privacy"]}</a></footer>`;
+  return `<footer><span>${note}</span> &nbsp;·&nbsp; <a href="/${lang}/faq">${S["footer.faq"]}</a> &nbsp;·&nbsp; <a href="/${lang}/api">${S["footer.api"]}</a> &nbsp;·&nbsp; <a href="/${lang}/about">${S["footer.about"]}</a> &nbsp;·&nbsp; <a href="/${lang}/privacy">${S["footer.privacy"]}</a></footer>`;
 }
 
 function renderPage(lang, page) {

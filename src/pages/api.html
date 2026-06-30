@@ -1,0 +1,47 @@
+<div class="page" style="max-width:680px;">
+  <h1>{{t:api.title}}</h1>
+  <p class="intro">{{t:api.intro}}</p>
+
+  <section class="card" style="margin-bottom:1.5rem;">
+    <h2 style="font-size:1.1rem;margin:0 0 0.5rem;">{{t:api.ip.h}}</h2>
+    <p style="margin:0 0 0.75rem;color:var(--muted);font-size:0.95rem;">{{t:api.ip.d}}</p>
+    <pre style="margin:0;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem;">curl https://whatsip.nl/ip
+203.0.113.42</pre>
+  </section>
+
+  <section class="card" style="margin-bottom:1.5rem;">
+    <h2 style="font-size:1.1rem;margin:0 0 0.5rem;">{{t:api.info.h}}</h2>
+    <p style="margin:0 0 0.75rem;color:var(--muted);font-size:0.95rem;">{{t:api.info.d}}</p>
+    <pre style="margin:0;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.85rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem;">curl https://whatsip.nl/api/info
+{
+  "ip": "203.0.113.42",
+  "family": "IPv4",
+  "reverseDns": "host.example.net",
+  "asn": 64500,
+  "org": "Example ISP",
+  "country": "NL",
+  "city": "Amsterdam",
+  "region": "North Holland",
+  "timezone": "Europe/Amsterdam",
+  "colo": "AMS",
+  "httpProtocol": "HTTP/3",
+  "tlsVersion": "TLSv1.3"
+}</pre>
+  </section>
+
+  <section class="card" style="margin-bottom:1.5rem;">
+    <h2 style="font-size:1.1rem;margin:0 0 0.5rem;">{{t:api.headers.h}}</h2>
+    <p style="margin:0 0 0.75rem;color:var(--muted);font-size:0.95rem;">{{t:api.headers.d}}</p>
+    <pre style="margin:0;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.9rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem;">curl https://whatsip.nl/api/headers</pre>
+  </section>
+
+  <section class="explainer">
+    <h2>{{t:api.notes.h}}</h2>
+    <p>{{t:api.notes.p1}}</p>
+    <p>{{t:api.notes.p2}}</p>
+  </section>
+
+  <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+    <a href="{{base}}" style="color:var(--accent);text-decoration:none;">← {{t:nav.myip}}</a>
+  </div>
+</div>
