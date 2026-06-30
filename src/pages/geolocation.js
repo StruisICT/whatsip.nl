@@ -2,88 +2,69 @@ document.addEventListener("DOMContentLoaded", function () {
   var t = window.t || function (k) { return k; };
   function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
   function field(k,v){if(v===null||v===undefined||v==="")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
+  function note(msg,err){grid.innerHTML='<p class="label"'+(err?' style="color:#ef4444"':'')+'>'+esc(msg)+'</p>';}
 
   var btn = document.getElementById("test");
   var grid = document.getElementById("grid");
 
-  // Check if geolocation is supported
   if (!navigator.geolocation) {
-    grid.innerHTML = '<p class="label" style="color:#ef4444">Geolocation not supported by this browser</p>';
+    note(t("geo.unsupported"), true);
     btn.disabled = true;
     return;
   }
 
-  // Check current permission state
-  if (navigator.permissions) {
-    navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-      if (result.state === 'granted') {
-        grid.innerHTML = '<p class="label">✓ Location already allowed. Click to test.</p>';
-      } else if (result.state === 'denied') {
-        grid.innerHTML = '<p class="label" style="color:#ef4444">✗ Location blocked. Enable in browser settings.</p>';
-      } else {
-        grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
-      }
-    }).catch(function() {
-      grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
-    });
+  // Reflect the current permission state (best-effort).
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: "geolocation" }).then(function (r) {
+      if (r.state === "granted") note(t("geo.granted"));
+      else if (r.state === "denied") note(t("geo.denied"), true);
+      else note(t("geo.testing"));
+    }).catch(function () { note(t("geo.testing")); });
   } else {
-    grid.innerHTML = '<p class="label">Click "Test Geolocation" to check browser location access</p>';
+    note(t("geo.testing"));
   }
 
-  btn.addEventListener("click", function() {
+  function locate(highAccuracy) {
     btn.disabled = true;
-    btn.textContent = "Testing...";
-    grid.innerHTML = '<p class="label">Requesting location permission...</p>';
+    btn.textContent = t("geo.btn.locating");
+    note(t("geo.requesting"));
 
     navigator.geolocation.getCurrentPosition(
-      function(position) {
-        var lat = position.coords.latitude.toFixed(6);
-        var lon = position.coords.longitude.toFixed(6);
-        var acc = position.coords.accuracy.toFixed(0);
-        var alt = position.coords.altitude ? position.coords.altitude.toFixed(0) + " m" : "Not available";
-        var altAcc = position.coords.altitudeAccuracy ? position.coords.altitudeAccuracy.toFixed(0) + " m" : "Not available";
-        var heading = position.coords.heading ? position.coords.heading.toFixed(0) + "°" : "Not available";
-        var speed = position.coords.speed ? position.coords.speed.toFixed(1) + " m/s" : "Not available";
-        var timestamp = new Date(position.timestamp).toLocaleString();
-
+      function (p) {
+        var c = p.coords;
+        var lat = c.latitude.toFixed(6);
+        var lon = c.longitude.toFixed(6);
         grid.innerHTML =
           field(t("geo.latitude"), lat) +
           field(t("geo.longitude"), lon) +
-          field(t("geo.accuracy"), acc + " meters") +
-          field(t("geo.altitude"), alt) +
-          field(t("geo.altitudeAccuracy"), altAcc) +
-          field(t("geo.heading"), heading) +
-          field(t("geo.speed"), speed) +
-          field(t("geo.timestamp"), timestamp) +
-          '<div class="field"><div class="k">'+t("geo.map")+'</div><div class="v"><a href="https://www.openstreetmap.org/?mlat='+lat+'&mlon='+lon+'&zoom=15" target="_blank" rel="noopener">View on OpenStreetMap ↗</a></div></div>';
-
-        btn.textContent = "Test Again";
+          field(t("geo.accuracy"), Math.round(c.accuracy) + " m") +
+          field(t("geo.altitude"), c.altitude != null ? Math.round(c.altitude) + " m" : "—") +
+          field(t("geo.heading"), c.heading != null ? Math.round(c.heading) + "°" : "—") +
+          field(t("geo.speed"), c.speed != null ? c.speed.toFixed(1) + " m/s" : "—") +
+          field(t("geo.timestamp"), new Date(p.timestamp).toLocaleString()) +
+          '<div class="field"><div class="k">' + esc(t("geo.map")) + '</div><div class="v"><a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon + '&zoom=15" target="_blank" rel="noopener">OpenStreetMap ↗</a></div></div>';
+        btn.textContent = t("geo.btn.again");
         btn.disabled = false;
       },
-      function(error) {
-        var msg = "";
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            msg = "Location permission denied by user";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            msg = "Location information unavailable";
-            break;
-          case error.TIMEOUT:
-            msg = "Location request timed out";
-            break;
-          default:
-            msg = "Unknown error: " + error.message;
-        }
-        grid.innerHTML = '<p class="label" style="color:#ef4444">'+esc(msg)+'</p>';
-        btn.textContent = "Try Again";
+      function (e) {
+        var msg;
+        if (e.code === e.PERMISSION_DENIED) msg = t("geo.err.denied");
+        else if (e.code === e.POSITION_UNAVAILABLE) msg = t("geo.err.unavailable");
+        else if (e.code === e.TIMEOUT) msg = t("geo.err.timeout");
+        else msg = t("geo.err.unknown") + " " + (e.message || "");
+        note(msg, true);
+        btn.textContent = t("geo.btn.again");
         btn.disabled = false;
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        // Network/Wi-Fi location: fast and reliable on desktop. High accuracy
+        // (GPS) only helps on phones and often just times out on desktop.
+        enableHighAccuracy: !!highAccuracy,
+        timeout: 20000,
+        maximumAge: 60000,
       }
     );
-  });
+  }
+
+  btn.addEventListener("click", function () { locate(false); });
 });
