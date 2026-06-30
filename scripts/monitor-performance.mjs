@@ -85,7 +85,8 @@ console.log('─'.repeat(60));
 const assets = [
   { name: 'CSS', url: 'https://whatsip.nl/style.css' },
   { name: 'JavaScript', url: 'https://whatsip.nl/app.js' },
-  { name: 'i18n', url: 'https://whatsip.nl/i18n.js' },
+  { name: 'i18n (EN)', url: 'https://whatsip.nl/i18n.en.js' },
+  { name: 'i18n (NL)', url: 'https://whatsip.nl/i18n.nl.js' },
   { name: 'Favicon', url: 'https://whatsip.nl/favicon.svg' },
   { name: 'Manifest', url: 'https://whatsip.nl/manifest.json' },
   { name: 'Service Worker', url: 'https://whatsip.nl/sw.js' },
