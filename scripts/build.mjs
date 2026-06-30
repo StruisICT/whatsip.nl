@@ -28,6 +28,7 @@ const PAGES = [
   { slug: "storage", out: "storage.html", title: "storage.title", desc: "storage.intro", frag: "storage", script: "storage", nav: "nav.storage" },
   { slug: "geolocation", out: "geolocation.html", title: "geo.title", desc: "geo.intro", frag: "geolocation", script: "geolocation", nav: "nav.geo" },
   { slug: "permissions", out: "permissions.html", title: "perm.title", desc: "perm.intro", frag: "permissions", script: "permissions", nav: "nav.perm" },
+  { slug: "speed", out: "speed.html", title: "speed.title", desc: "speed.intro", frag: "speed", script: null, nav: "nav.speed" },
   { slug: "api", out: "api.html", title: "api.title", desc: "api.intro", frag: "api", script: null, nav: null },
   { slug: "faq", out: "faq.html", title: "faq.title", desc: "faq.intro", frag: "faq", script: null, nav: null },
   { slug: "about", out: "about.html", title: "about.title", desc: "about.intro", frag: "about", script: null, nav: null },
