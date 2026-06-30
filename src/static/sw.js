@@ -50,7 +50,6 @@ self.addEventListener('fetch', (event) => {
   
   // Skip API calls that need network
   if (event.request.url.includes('/api/') || 
-      event.request.url.includes('/speedtest') ||
       event.request.url.includes('/ip')) {
     return;
   }
