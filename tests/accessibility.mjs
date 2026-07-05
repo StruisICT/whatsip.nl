@@ -3,7 +3,7 @@
  * WCAG 2.2 AAA compliance checks using axe-core
  */
 import { chromium } from '@playwright/test';
-import { injectAxe, checkA11y } from 'axe-playwright';
+import { AxeBuilder } from '@axe-core/playwright';
 
 const BASE_URL = process.env.TEST_URL || 'https://whatsip.nl';
 const PAGES = [
@@ -29,22 +29,16 @@ for (const pagePath of PAGES) {
   console.log(`Checking ${pagePath}...`);
   
   try {
-    await page.goto(url, { waitUntil: 'networkidle' });
-    
-    // Inject axe-core
-    await injectAxe(page);
-    
+    // 'load', not 'networkidle': the IPv6 page's capability probe keeps the
+    // network busy and networkidle never settles outside production
+    await page.goto(url, { waitUntil: 'load' });
+    await page.waitForTimeout(1000);
+
     // Run accessibility check
-    const results = await page.evaluate(async () => {
-      // @ts-ignore
-      return await axe.run({
-        runOnly: {
-          type: 'tag',
-          values: ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa']
-        }
-      });
-    });
-    
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa'])
+      .analyze();
+
     if (results.violations.length > 0) {
       console.log(`  ✗ ${results.violations.length} violations found:`);
       for (const violation of results.violations) {

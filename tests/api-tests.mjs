@@ -3,6 +3,10 @@
  * Test /ip, /api/info, /api/headers return correct data
  */
 const BASE_URL = process.env.TEST_URL || "https://whatsip.nl";
+// Outside Cloudflare (wrangler pages dev) there is no CF-Connecting-IP header;
+// inject one so /ip and /api/info behave. Never sent to production — Cloudflare
+// overwrites it there anyway.
+const IP_HDRS = BASE_URL.includes("localhost") ? { "CF-Connecting-IP": "203.0.113.9" } : {};
 
 let errors = 0;
 
@@ -20,7 +24,7 @@ console.log(`Testing API endpoints at ${BASE_URL}...\n`);
 
 // Test /ip endpoint
 await test("GET /ip returns plain text IP", async () => {
-  const res = await fetch(`${BASE_URL}/ip`);
+  const res = await fetch(`${BASE_URL}/ip`, { headers: IP_HDRS });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   
   const contentType = res.headers.get("content-type");
@@ -37,7 +41,7 @@ await test("GET /ip returns plain text IP", async () => {
 
 // Test /api/info endpoint
 await test("GET /api/info returns JSON with required fields", async () => {
-  const res = await fetch(`${BASE_URL}/api/info`);
+  const res = await fetch(`${BASE_URL}/api/info`, { headers: IP_HDRS });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   
   const contentType = res.headers.get("content-type");
