@@ -20,7 +20,9 @@ const OFFLINE_CAPABLE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(OFFLINE_CAPABLE);
+      // cache:'reload' bypasses the HTTP cache — assets are served immutable,
+      // so a plain fetch could precache a stale copy
+      return cache.addAll(OFFLINE_CAPABLE.map((u) => new Request(u, { cache: 'reload' })));
     })
   );
   self.skipWaiting();

@@ -7,7 +7,15 @@
       <button class="btn" id="copy" type="button" disabled style="margin-top:1rem">{{t:home.copy}}</button>
     </section>
 
-    <section class="grid" id="grid" aria-label="Connection details"></section>
+    <section class="grid" id="grid" aria-label="Connection details">
+      <div class="field" data-field="isp"><div class="k">{{t:f.isp}}</div><div class="v">…</div></div>
+      <div class="field" data-field="location"><div class="k">{{t:f.location}}</div><div class="v">…</div></div>
+      <div class="field" data-field="rdns"><div class="k">{{t:f.rdns}}</div><div class="v">…</div></div>
+      <div class="field" data-field="latency"><div class="k">{{t:f.latency}}</div><div class="v">…</div></div>
+      <div class="field" data-field="connection"><div class="k">{{t:f.connection}}</div><div class="v">…</div></div>
+      <div class="field" data-field="timezone"><div class="k">{{t:f.timezone}}</div><div class="v">…</div></div>
+      <div class="field" data-field="vpnhint"><div class="k">{{t:f.vpnhint}}</div><div class="v">…</div></div>
+    </section>
 
     <p class="tip"><span>{{t:home.tip}}</span>
       <code>curl whatsip.nl/ip</code> · <code>curl whatsip.nl/api/info</code></p>

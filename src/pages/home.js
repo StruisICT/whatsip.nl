@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
   var t = window.t || function (k) { return k; };
-  function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
-  function field(k,v){if(v===null||v===undefined||v==="")return"";return '<div class="field"><div class="k">'+k+'</div><div class="v">'+esc(v)+"</div></div>";}
 
   // Measure real round-trip latency to the edge (Cloudflare's clientTcpRtt is often 0).
   function measureLatency(){
@@ -31,19 +29,24 @@ document.addEventListener("DOMContentLoaded", function () {
     return btz===ipTz ? t("vpn.none") : t("vpn.maybe")+" ("+btz+" ≠ "+ipTz+")";
   }
 
+  // Fields are pre-rendered in the HTML (labels + "…") so filling them causes
+  // no layout shift; unavailable values become "—" instead of removing the row.
+  function set(name,v){
+    var el=document.querySelector('[data-field="'+name+'"] .v');
+    if(el) el.textContent=(v===null||v===undefined||v==="")?"—":v;
+  }
+
   fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
     var ipEl=document.getElementById("ip");
     ipEl.textContent=d.ip||"unknown";
     document.getElementById("family").textContent=(d.family||"")+(d.colo?" · via "+d.colo:"");
 
-    document.getElementById("grid").innerHTML=
-      field(t("f.isp"),d.org?d.org+(d.asn?" (AS"+d.asn+")":""):null)+
-      field(t("f.location"),[d.city,d.region,d.country].filter(Boolean).join(", ")||d.country)+
-      field(t("f.rdns"),d.reverseDns)+
-      '<div class="field" data-field="latency"><div class="k">'+esc(t("f.latency"))+'</div><div class="v">…</div></div>'+
-      field(t("f.connection"),[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "))+
-      field(t("f.timezone"),d.timezone)+
-      field(t("f.vpnhint"),vpnHint(d.timezone));
+    set("isp",d.org?d.org+(d.asn?" (AS"+d.asn+")":""):null);
+    set("location",[d.city,d.region,d.country].filter(Boolean).join(", ")||d.country);
+    set("rdns",d.reverseDns);
+    set("connection",[d.httpProtocol,d.tlsVersion].filter(Boolean).join(" · "));
+    set("timezone",d.timezone);
+    set("vpnhint",vpnHint(d.timezone));
 
     var btn=document.getElementById("copy");
     btn.disabled=false;
@@ -57,5 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var ipEl=document.getElementById("ip");
     ipEl.textContent=t("err.ip");
     ipEl.style.color="#ef4444";
+    ["isp","location","rdns","latency","connection","timezone","vpnhint"].forEach(function(n){set(n,null);});
   });
 });
