@@ -20,10 +20,10 @@ const STR = JSON.parse(fs.readFileSync(path.join(SRC, "strings.json"), "utf8"));
 // Pages: slug "" is the home page. `nav` = appears in the top tab bar.
 const PAGES = [
   { slug: "", out: "index.html", title: "title.home", desc: "desc.home", frag: "home", script: "home", nav: "nav.myip" },
+  { slug: "ipv6", out: "ipv6.html", title: "title.ipv6", desc: "desc.ipv6", frag: "ipv6", script: "ipv6", nav: "nav.ipv6" },
   { slug: "browser", out: "browser.html", title: "title.browser", desc: "desc.browser", frag: "browser", script: "browser", nav: "nav.browser" },
   { slug: "headers", out: "headers.html", title: "title.headers", desc: "desc.headers", frag: "headers", script: "headers", nav: "nav.headers" },
   { slug: "webrtc", out: "webrtc.html", title: "title.webrtc", desc: "desc.webrtc", frag: "webrtc", script: "webrtc", nav: "nav.webrtc" },
-  { slug: "ipv6", out: "ipv6.html", title: "title.ipv6", desc: "desc.ipv6", frag: "ipv6", script: "ipv6", nav: "nav.ipv6" },
   { slug: "storage", out: "storage.html", title: "storage.title", desc: "storage.intro", frag: "storage", script: "storage", nav: "nav.storage" },
   { slug: "geolocation", out: "geolocation.html", title: "geo.title", desc: "geo.intro", frag: "geolocation", script: "geolocation", nav: "nav.geo" },
   { slug: "permissions", out: "permissions.html", title: "perm.title", desc: "perm.intro", frag: "permissions", script: "permissions", nav: "nav.perm" },
@@ -103,7 +103,7 @@ function nav(lang, slug) {
 function footer(lang, slug) {
   const S = STR[lang];
   const note = slug === "" ? S["footer.privacyNote"] : S["footer.note"];
-  return `<footer><span>${note}</span> &nbsp;·&nbsp; <a href="/${lang}/api">${S["footer.api"]}</a> &nbsp;·&nbsp; <a href="/${lang}/about">${S["footer.about"]}</a> &nbsp;·&nbsp; <a href="/${lang}/privacy">${S["footer.privacy"]}</a></footer>`;
+  return `<footer><span>${note}</span> &nbsp;·&nbsp; <a href="/${lang}/api">${S["footer.api"]}</a> &nbsp;·&nbsp; <a href="/${lang}/about">${S["footer.about"]}</a> &nbsp;·&nbsp; <a href="/${lang}/privacy">${S["footer.privacy"]}</a><br /><span class="copyright">© <a href="https://struisict.com" rel="noopener">Struisict.com</a></span></footer>`;
 }
 
 function renderPage(lang, page) {
