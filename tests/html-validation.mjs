@@ -17,8 +17,10 @@ const htmlvalidate = new HtmlValidate({
     "no-unknown-elements": "off",
     // We use inline styles for theme initialization
     "no-inline-style": "off",
-    // Relaxed for specific AdSense requirements
-    "attribute-allowed-values": "off",
+    // Codebase style: XHTML-ish self-closing void tags and lowercase doctype
+    // (both valid HTML5)
+    "void-style": ["error", { style: "selfclosing" }],
+    "doctype-style": "off",
   },
 });
 
@@ -33,7 +35,7 @@ console.log("Validating HTML files...\n");
 for (const lang of LANGS) {
   for (const page of PAGES) {
     const filePath = path.join(DIST, lang, page);
-    const report = htmlvalidate.validateFile(filePath);
+    const report = await htmlvalidate.validateFile(filePath);
 
     if (!report.valid) {
       console.log(`✗ /${lang}/${page}:`);
