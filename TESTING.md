@@ -13,7 +13,7 @@ Verifies:
 - Assets exist (CSS, JS, sitemap, robots.txt)
 - Pages have minimum content and correct structure
 - Sitemap contains all URLs
-- AdSense script present
+- No ad scripts present (site is ad-free)
 
 ### 2. HTML Validation
 **File:** `tests/html-validation.mjs`  

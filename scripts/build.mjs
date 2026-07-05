@@ -64,11 +64,7 @@ function head(lang, page) {
   <meta name="twitter:title" content="${attr(S[page.title])}" />
   <meta name="twitter:description" content="${attr(S[page.desc])}" />
   <meta name="twitter:image" content="${ORIGIN}/favicon.svg" />
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732510177342289" crossorigin="anonymous"></script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="/style.css?v=${BUILD_VERSION}" />

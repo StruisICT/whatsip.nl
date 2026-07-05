@@ -51,7 +51,10 @@ visitor ──https──> Cloudflare edge
 - **AdSense**: low RPM utility niche ($0.5–3/1k views), high ad-block audience. Ship
   fast/ad-free first, lazy-load ads after first paint, add content pages for approval.
 
-## AdSense (included from the start)
+## AdSense (removed July 2026)
+
+> **Superseded:** AdSense was removed entirely on 2026-07-05 after a second review
+> rejection. The site is ad-free. The section below is historical.
 
 - Script in `index.html` <head>: `client=ca-pub-1732510177342289`.
 - `public/ads.txt` authorises the publisher (required by AdSense).
@@ -82,8 +85,9 @@ visitor ──https──> Cloudflare edge
 
 ## Open items
 
-- [ ] Move `whatsip.nl` to a Cloudflare zone (status: "almost").
-- [ ] Create the AdSense ad unit and paste its real `data-ad-slot` ID.
-- [ ] Connect the repo to Cloudflare Pages + map the `whatsip.nl` domain.
-- [ ] Verify ads render (check CSP if blocked) and submit site for AdSense review.
+- [x] Move `whatsip.nl` to a Cloudflare zone.
+- [x] Connect the repo to Cloudflare Pages + map the `whatsip.nl` domain.
+- [x] ~~AdSense~~ — removed entirely (2026-07-05) after a second review rejection.
 - [ ] Repo public or private (currently private).
+
+Current status lives in [`LAUNCH.md`](./LAUNCH.md).

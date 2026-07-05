@@ -39,6 +39,8 @@
 ---
 
 ### 3. **Lazy-Load AdSense** ⭐ High Impact
+> **Superseded (July 2026):** AdSense was removed from the site entirely; sections 3 and 4 are kept for historical reference only.
+
 **Problem**: AdSense scripts execute immediately, delaying main thread and LCP  
 **Solution**: Only load ad when it's about to enter viewport (IntersectionObserver)
 

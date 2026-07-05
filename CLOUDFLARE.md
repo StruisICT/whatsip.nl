@@ -49,20 +49,14 @@ gets its own `*.whatsip.pages.dev` preview URL.
 curl -s https://whatsip.nl/ip            # your IP, plain text
 curl -s https://whatsip.nl/api/info      # JSON
 curl -sI https://whatsip.nl/ | grep -i strict-transport   # HSTS present
-curl -s https://whatsip.nl/ads.txt       # AdSense authorisation
 ```
 
 Open the page → IP shows instantly, Copy works, dark/light toggles.
 
-## Step 5 — AdSense go-live
+## Step 5 — AdSense (removed)
 
-1. In AdSense → **Sites** → add `whatsip.nl` → request review.
-2. Create a **display ad unit**, copy its **slot ID**, and replace
-   `data-ad-slot="0000000000"` in the **5 `src/pages/*.html` templates** — home,
-   browser, headers, webrtc, ipv6 (or enable Auto Ads and remove the `<ins>`
-   blocks), then rebuild.
-3. If ads don't render, widen the `script-src` / `frame-src` allowlist in
-   `src/static/_headers` (CSP is the usual culprit).
+AdSense was removed entirely in July 2026 after a second review rejection.
+The site is ad-free: no ad scripts, no `ads.txt`, CSP is self-only.
 
 ## Alternative — deploy from the CLI (for a quick test before Git is connected)
 

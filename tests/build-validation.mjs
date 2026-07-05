@@ -11,7 +11,7 @@ const DIST = path.join(ROOT, "dist");
 
 const LANGS = ["en", "nl"];
 const PAGES = ["index.html", "browser.html", "headers.html", "webrtc.html", "ipv6.html", "privacy.html"];
-const ASSETS = ["style.css", "app.js", "i18n.js", "ads.txt", "robots.txt", "sitemap.xml", "_headers", "_redirects"];
+const ASSETS = ["style.css", "app.js", "i18n.en.js", "i18n.nl.js", "robots.txt", "sitemap.xml", "_headers", "_redirects"];
 
 let errors = 0;
 
@@ -70,7 +70,8 @@ LANGS.forEach(lang => {
 // Test 6: Sitemap contains all URLs
 test("sitemap.xml contains all pages", () => {
   const sitemap = fs.readFileSync(path.join(DIST, "sitemap.xml"), "utf8");
-  const expectedCount = LANGS.length * (PAGES.length);
+  const builtPages = fs.readdirSync(path.join(DIST, "en")).filter((f) => f.endsWith(".html")).length;
+  const expectedCount = LANGS.length * builtPages;
   const urlCount = (sitemap.match(/<loc>/g) || []).length;
   if (urlCount !== expectedCount) {
     throw new Error(`Expected ${expectedCount} URLs, found ${urlCount}`);
@@ -84,10 +85,10 @@ test("robots.txt references sitemap", () => {
 });
 
 // Test 8: AdSense script in pages
-test("AdSense script present in pages", () => {
+test("no ad scripts in pages", () => {
   const content = fs.readFileSync(path.join(DIST, "en", "index.html"), "utf8");
-  if (!content.includes("pagead2.googlesyndication.com")) {
-    throw new Error("AdSense script missing");
+  if (content.includes("googlesyndication.com") || content.includes("adsbygoogle")) {
+    throw new Error("Unexpected ad script found");
   }
 });
 
@@ -97,16 +98,13 @@ test("style.css has content", () => {
   if (css.length < 1000) throw new Error("CSS file too small");
 });
 
-// Test 10: i18n.js generated
-test("i18n.js contains translations", () => {
-  const i18n = fs.readFileSync(path.join(DIST, "i18n.js"), "utf8");
-  if (!i18n.includes("window.t")) throw new Error("Missing t() function");
-  if (!i18n.includes('"en"') || !i18n.includes('"nl"')) {
-    throw new Error("Missing language keys");
-  }
-  if (!i18n.includes("What is my IP") || !i18n.includes("Wat is mijn IP")) {
-    throw new Error("Missing translations");
-  }
+// Test 10: per-language i18n bundles generated
+test("i18n bundles contain translations", () => {
+  const en = fs.readFileSync(path.join(DIST, "i18n.en.js"), "utf8");
+  const nl = fs.readFileSync(path.join(DIST, "i18n.nl.js"), "utf8");
+  if (!en.includes("window.t") || !nl.includes("window.t")) throw new Error("Missing t() function");
+  if (!en.includes("What is my IP")) throw new Error("Missing EN translations");
+  if (!nl.includes("Wat is mijn IP")) throw new Error("Missing NL translations");
 });
 
 console.log(`\n${errors === 0 ? "✓" : "✗"} Build validation: ${errors === 0 ? "PASSED" : `FAILED (${errors} errors)`}`);

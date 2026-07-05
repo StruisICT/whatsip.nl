@@ -153,16 +153,5 @@ await test("GET /robots.txt returns valid robots file", async () => {
   if (!txt.includes("Sitemap:")) throw new Error("Missing sitemap reference");
 });
 
-// Test ads.txt
-await test("GET /ads.txt returns AdSense publisher ID", async () => {
-  const res = await fetch(`${BASE_URL}/ads.txt`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  
-  const txt = await res.text();
-  if (!txt.includes("google.com, pub-1732510177342289")) {
-    throw new Error("Missing or wrong publisher ID");
-  }
-});
-
 console.log(`\n${errors === 0 ? "✓" : "✗"} API tests: ${errors === 0 ? "PASSED" : `FAILED (${errors} errors)`}`);
 process.exit(errors > 0 ? 1 : 0);

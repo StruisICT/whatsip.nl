@@ -138,19 +138,13 @@ test.describe('whatsip.nl E2E tests', () => {
     
     await expect(page).toHaveTitle(/Privacy/);
     await expect(page.locator('main')).toContainText(/No cookies/);
-    await expect(page.locator('main')).toContainText(/AdSense/);
   });
 
-  test('AdSense script loads', async ({ page }) => {
+  test('no ad scripts load', async ({ page }) => {
     await page.goto('/en/');
-    
-    // Check AdSense script is present
+
     const adsenseScript = page.locator('script[src*="googlesyndication.com"]');
-    await expect(adsenseScript).toHaveCount(1);
-    
-    // Verify publisher ID
-    const src = await adsenseScript.getAttribute('src');
-    expect(src).toContain('ca-pub-1732510177342289');
+    await expect(adsenseScript).toHaveCount(0);
   });
 
   test('hreflang tags are correct', async ({ page }) => {
