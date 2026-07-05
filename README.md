@@ -4,7 +4,7 @@ A tiny, very fast **what's-my-IP** site. Edge-served on Cloudflare Pages, no
 framework, privacy-first (no cookies, no trackers, no ads).
 
 See [`PLAN.md`](./PLAN.md) for the architecture, pipeline, and cost analysis.
-Want to host your own copy? The [wiki](https://github.com/Struis112/whatsip.nl/wiki) explains how everything works, including a [self-hosting guide](https://github.com/Struis112/whatsip.nl/wiki/Self-Hosting).
+Want to host your own copy? The [wiki](https://github.com/StruisICT/whatsip.nl/wiki) explains how everything works, including a [self-hosting guide](https://github.com/StruisICT/whatsip.nl/wiki/Self-Hosting).
 
 ## Status
 
