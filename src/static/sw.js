@@ -1,6 +1,6 @@
 // Service Worker for whatsip.nl
-// Provides offline support for static pages (browser info, headers, DNS test)
-const CACHE_NAME = 'whatsip-v2';
+// Provides offline support for static pages (browser info, headers)
+const CACHE_NAME = 'whatsip-v3';
 const OFFLINE_CAPABLE = [
   '/',
   '/en/',
@@ -9,8 +9,6 @@ const OFFLINE_CAPABLE = [
   '/nl/browser',
   '/en/headers',
   '/nl/headers',
-  '/en/dns',
-  '/nl/dns',
   '/style.css',
   '/app.js',
   '/i18n.en.js',

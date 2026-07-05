@@ -5,3 +5,11 @@
 
 # Redirect www to apex domain (must configure www.whatsip.nl as custom domain in Cloudflare Pages)
 https://www.whatsip.nl/* https://whatsip.nl/:splat 301
+
+# Pages removed in the July 2026 trim (were indexed; keep 301s)
+/en/dns /en/ 301
+/nl/dns /nl/ 301
+/en/speed /en/ 301
+/nl/speed /nl/ 301
+/en/faq /en/about 301
+/nl/faq /nl/about 301

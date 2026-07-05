@@ -11,7 +11,7 @@ const PAGES = [
   { name: 'Browser Info', url: 'https://whatsip.nl/en/browser' },
   { name: 'Storage Test', url: 'https://whatsip.nl/en/storage' },
   { name: 'Geolocation', url: 'https://whatsip.nl/en/geolocation' },
-  { name: 'DNS Leak', url: 'https://whatsip.nl/en/dns' },
+  { name: 'Headers', url: 'https://whatsip.nl/en/headers' },
 ];
 
 const APIS = [

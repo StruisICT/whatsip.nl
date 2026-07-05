@@ -7,15 +7,15 @@
 
 ## Site at a glance
 
-- **28 pages** total — 14 pages × 2 languages (EN / NL)
-- **Sitemap:** https://whatsip.nl/sitemap.xml (28 URLs, hreflang + lastmod)
+- **22 pages** total — 11 pages × 2 languages (EN / NL)
+- **Sitemap:** https://whatsip.nl/sitemap.xml (22 URLs, hreflang + lastmod)
 - **First visit:** ~15 KB; later pages mostly cached
 - **Edge response:** <100 ms globally (Cloudflare)
 - **No cookies, no tracking, no ads, IP never stored**
 
 ---
 
-## Tools (10) + content pages (4)
+## Tools (8) + content pages (3)
 
 | Page | Path | What it shows |
 |------|------|---------------|
@@ -24,25 +24,19 @@
 | Headers | `/headers` | HTTP request headers (cookies redacted), copy as JSON |
 | WebRTC | `/webrtc` | Local/public address exposure vs. your public IP |
 | IPv6 | `/ipv6` | Protocol used + IPv6 capability (via `ipv4`/`ipv6.whatsip.nl`) |
-| DNS | `/dns` | **Honest DNS-privacy guide**: links to a real leak test + DoH how-to (see note) |
 | Storage | `/storage` | Cookies, LocalStorage, SessionStorage, IndexedDB, quota (`storage.estimate`), DNT |
 | Geolocation | `/geolocation` | Browser geolocation (permission-gated) + OpenStreetMap link |
 | Permissions | `/permissions` | Which permissions a site can request + their current state (read-only, requests nothing) |
-| Speed Test | `/speed` | Links to trusted external tests (Cloudflare, Ookla, Google) — see note |
 | API | `/api` | Developer docs for the free, no-key endpoints (`/ip`, `/api/info`, `/api/headers`) |
-| FAQ | `/faq` | 8 Q&As on IP, IPv4/6, privacy, VPNs |
 | About | `/about` | What the site is, privacy stance, honesty about limits |
 | Privacy | `/privacy` | Privacy policy |
-
-Every tool page carries a short bilingual **explainer** below the result.
 
 ---
 
 ## Honest-by-design decisions
 
-- **Speed test links out.** A browser can't accurately measure a gigabit line (JS tests cap around 500–600 Mbps); rather than show misleading numbers, `/speed` links to trusted external tests (Cloudflare, Ookla, Google) with an explainer.
 - **No ads.** AdSense was removed entirely (rejected twice); the site is free, ad-free, and tracker-free.
-- **DNS page links out.** A real DNS-leak test needs an authoritative DNS server to see the resolver IP — impossible from a static site — so the page explains this and links to `dnsleaktest.com` instead of faking a verdict.
+- **No fake tests.** The Speed Test and DNS pages only linked out to external tools (a browser can't accurately measure a gigabit line, and a real DNS-leak test needs an authoritative DNS server) — with ads gone they added nothing, so they were removed in the July 2026 trim along with the FAQ and the per-tool explainer content that existed mainly for AdSense approval. Old URLs 301-redirect.
 - Removed low-signal browser fields (device memory, pixel ratio, viewport, touch points, user agent).
 
 ---
@@ -52,7 +46,7 @@ Every tool page carries a short bilingual **explainer** below the result.
 - **Cloudflare Pages**, build `node scripts/build.mjs`, output `dist/`
 - **Edge functions:** `/ip`, `/api/info`, `/api/headers`, `/` (Accept-Language redirect)
 - **DNS zone** `whatsip.nl` (id `4e0018cc99e8b56fe2133a41d463d829`): apex, `www` (→ apex 301), `ipv4`, `ipv6`, mail/TXT. (Old `test1-5` records removed.)
-- **Build:** `src/` templates + `strings.json` → 28 localized pages + per-language `i18n.en.js`/`i18n.nl.js` + `sitemap.xml`
+- **Build:** `src/` templates + `strings.json` → 22 localized pages + per-language `i18n.en.js`/`i18n.nl.js` + `sitemap.xml`
 
 ---
 

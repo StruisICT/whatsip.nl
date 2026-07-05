@@ -36,9 +36,9 @@ function isInternal(url) {
 }
 
 function resolveInternalPath(url, lang) {
-  // Remove BASE_URL prefix if present
-  let cleanUrl = url.replace(BASE_URL, "");
-  
+  // Remove BASE_URL prefix if present, plus cache-busting query / fragment
+  let cleanUrl = url.replace(BASE_URL, "").replace(/[?#].*$/, "");
+
   // Handle root
   if (cleanUrl === "/" || cleanUrl === "") return path.join(DIST, lang, "index.html");
   
