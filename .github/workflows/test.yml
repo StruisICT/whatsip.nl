@@ -8,6 +8,11 @@ on:
     # Nightly performance tests at 2 AM UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
+    inputs:
+      update_visual_baselines:
+        description: 'Regenerate visual-regression baselines and upload them as an artifact (download + commit them afterwards)'
+        type: boolean
+        default: false
 
 jobs:
   build-and-validate:
@@ -196,8 +201,10 @@ jobs:
   visual-regression:
     name: Visual Regression
     runs-on: ubuntu-latest
-    # Only on PRs (to catch visual changes)
-    if: github.event_name == 'pull_request'
+    # On PRs (to catch visual changes) and manual dispatch (verify or
+    # regenerate baselines — they are Linux-rendered, so they must come
+    # from a runner, not a dev machine)
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v7
       
@@ -222,10 +229,25 @@ jobs:
           echo "wrangler pages dev failed to start"; cat wrangler-dev.log; exit 1
 
       - name: Run visual tests
+        if: inputs.update_visual_baselines != true
         run: npm run test:visual
         env:
           TEST_URL: http://localhost:8788
-      
+
+      - name: Regenerate baselines
+        if: inputs.update_visual_baselines == true
+        run: npx playwright test --project=visual --update-snapshots
+        env:
+          TEST_URL: http://localhost:8788
+
+      - name: Upload baselines
+        if: inputs.update_visual_baselines == true
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines
+          path: tests/e2e/visual.spec.ts-snapshots/
+          retention-days: 7
+
       - name: Upload screenshots
         if: failure()
         uses: actions/upload-artifact@v7

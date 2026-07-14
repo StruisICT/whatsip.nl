@@ -13,3 +13,7 @@ lighthouse-reports/
 *.png
 *.jpg
 !tests/e2e/*.spec.ts-snapshots/
+
+# Visual baselines are Linux-rendered (generated on CI); never commit local ones
+tests/e2e/visual.spec.ts-snapshots/*-win32.png
+tests/e2e/visual.spec.ts-snapshots/*-darwin.png
