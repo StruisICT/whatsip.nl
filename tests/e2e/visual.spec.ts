@@ -1,8 +1,16 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Fields whose values change run-to-run and must not affect the diff:
-// measured latency on the home page, GPU renderer string on the browser page.
-const homeMask = (page: Page) => [page.locator('[data-field="latency"] .v')];
+// Fields whose values change run-to-run and must not affect the diff.
+// Home page: latency is measured live, and the colo line, ISP, location,
+// timezone, and VPN hint all follow the runner's real egress IP — GitHub
+// runners land in different Azure regions per run.
+// Browser page: the GPU renderer string depends on the runner image.
+const homeMask = (page: Page) => [
+  page.locator('#family'),
+  ...['latency', 'isp', 'location', 'timezone', 'vpnhint'].map((f) =>
+    page.locator(`[data-field="${f}"] .v`),
+  ),
+];
 const browserMask = (page: Page) => [
   page.locator('.field', { has: page.locator('.k', { hasText: 'GPU' }) }).locator('.v'),
 ];
