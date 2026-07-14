@@ -14,6 +14,6 @@ lighthouse-reports/
 *.jpg
 !tests/e2e/*.spec.ts-snapshots/
 
-# Visual baselines are Linux-rendered (generated on CI); never commit local ones
-tests/e2e/visual.spec.ts-snapshots/*-win32.png
-tests/e2e/visual.spec.ts-snapshots/*-darwin.png
+# Visual baselines are Linux-rendered (generated on CI); the global *.png
+# ignore keeps local win32/darwin snapshots out, only -linux is tracked
+!tests/e2e/visual.spec.ts-snapshots/*-linux.png
