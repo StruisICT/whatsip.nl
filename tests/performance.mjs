@@ -2,11 +2,16 @@
  * Performance tests using Lighthouse
  * Verify Core Web Vitals and Lighthouse scores
  */
+import { mkdir, writeFile } from 'node:fs/promises';
 import lighthouse from 'lighthouse';
 import { chromium } from '@playwright/test';
 
 const BASE_URL = process.env.TEST_URL || 'https://whatsip.nl';
 const PAGES = ['/en/', '/en/browser'];
+const REPORT_DIR = 'lighthouse-reports';
+// Lighthouse talks CDP directly, so Chromium must expose a debugging port —
+// Playwright's own connection uses a pipe and doesn't provide one.
+const CDP_PORT = 9222;
 
 // Minimum acceptable scores (0-100)
 const THRESHOLDS = {
@@ -20,15 +25,19 @@ let failures = 0;
 
 console.log('Running Lighthouse performance tests...\n');
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({
+  headless: true,
+  args: [`--remote-debugging-port=${CDP_PORT}`],
+});
+await mkdir(REPORT_DIR, { recursive: true });
 
 for (const pagePath of PAGES) {
   const url = `${BASE_URL}${pagePath}`;
   console.log(`Testing ${pagePath}...`);
-  
+
   try {
-    const { lhr } = await lighthouse(url, {
-      port: new URL(browser.wsEndpoint()).port,
+    const { lhr, report } = await lighthouse(url, {
+      port: CDP_PORT,
       output: 'json',
       onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
       formFactor: 'desktop',
@@ -41,6 +50,9 @@ for (const pagePath of PAGES) {
       },
     });
     
+    const slug = pagePath.replaceAll('/', '-').replace(/^-|-$/g, '') || 'home';
+    await writeFile(`${REPORT_DIR}/${slug}.json`, report);
+
     const scores = {
       performance: Math.round(lhr.categories.performance.score * 100),
       accessibility: Math.round(lhr.categories.accessibility.score * 100),
