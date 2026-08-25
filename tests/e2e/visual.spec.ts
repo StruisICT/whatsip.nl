@@ -11,6 +11,28 @@ const homeMask = (page: Page) => [
     page.locator(`[data-field="${f}"] .v`),
   ),
 ];
+
+// The IP-derived fields (isp, location, timezone, vpn hint, colo) follow the
+// runner's real egress IP, so their *length* varies per run. A long value wraps
+// to a second line, and since the cards have no fixed height the masked box
+// grows with it — making the mask a different size each run and the diff flaky.
+// Pin them to fixed single-line values so the masked region is stable. Latency
+// stays live+masked; its value ("… "/"12 ms") is always one line, so it can't
+// wrap. Call this after the fields have populated, just before the screenshot.
+async function freezeDynamicFields(page: Page) {
+  await page.evaluate(() => {
+    const set = (f: string, v: string) => {
+      const el = document.querySelector(`[data-field="${f}"] .v`);
+      if (el) el.textContent = v;
+    };
+    set('isp', 'Example ISP (AS64500)');
+    set('location', 'Amsterdam, NL');
+    set('timezone', 'Europe/Amsterdam');
+    set('vpnhint', 'No');
+    const fam = document.getElementById('family');
+    if (fam) fam.textContent = 'IPv4';
+  });
+}
 const browserMask = (page: Page) => [
   page.locator('.field', { has: page.locator('.k', { hasText: 'GPU' }) }).locator('.v'),
 ];
@@ -29,7 +51,8 @@ test.describe('Visual regression tests', () => {
     await page.evaluate(() => {
       document.documentElement.setAttribute('data-theme', 'light');
     });
-    
+
+    await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-en-light.png', { mask: homeMask(page) });
   });
   
@@ -41,13 +64,15 @@ test.describe('Visual regression tests', () => {
     await page.evaluate(() => {
       document.documentElement.setAttribute('data-theme', 'dark');
     });
-    
+
+    await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-en-dark.png', { mask: homeMask(page) });
   });
   
   test('homepage (Dutch)', async ({ page }) => {
     await page.goto('/nl/');
     await expect(page.locator('#ip')).not.toHaveText('…');
+    await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-nl.png', { mask: homeMask(page) });
   });
   
@@ -97,7 +122,8 @@ test.describe('Visual regression tests', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/en/');
     await expect(page.locator('#ip')).not.toHaveText('…');
-    
+
+    await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-mobile.png', { mask: homeMask(page) });
   });
   
