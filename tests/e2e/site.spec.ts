@@ -83,6 +83,19 @@ test.describe('whatsip.nl E2E tests', () => {
     await expect(grid).toContainText(/Browser|Platform|Screen/i);
   });
 
+  test('tool grid re-translates on language toggle', async ({ page }) => {
+    await page.goto('/browser');
+    // JS-rendered label in English first
+    await expect(page.locator('#grid')).toContainText('CPU cores', { timeout: 3000 });
+
+    await page.locator('#lang').click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'nl');
+
+    // The JS-generated grid should now be Dutch (not just the static chrome)
+    await expect(page.locator('#grid')).toContainText('CPU-kernen');
+    await expect(page.locator('#grid')).not.toContainText('CPU cores');
+  });
+
   test('headers page displays request headers', async ({ page }) => {
     await page.goto('/headers');
 

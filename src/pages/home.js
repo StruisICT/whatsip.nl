@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var t = window.t || function (k) { return k; };
+  function tf(){ return window.t || function (k) { return k; }; }
 
   // Measure real round-trip latency to the edge (Cloudflare's clientTcpRtt is often 0).
   function measureLatency(){
@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Honest heuristic: if the browser's own timezone differs from the timezone
   // implied by the IP's location, the user may be on a VPN/proxy.
   function vpnHint(ipTz){
+    var t=tf();
     var btz="";try{btz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";}catch(e){}
     if(!btz||!ipTz) return null;
     return btz===ipTz ? t("vpn.none") : t("vpn.maybe")+" ("+btz+" ≠ "+ipTz+")";
@@ -36,7 +37,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if(el) el.textContent=(v===null||v===undefined||v==="")?"—":v;
   }
 
+  var data=null, failed=false;
+
+  // Re-apply the translated dynamic bits when the language is toggled.
+  function reI18n(){
+    var t=tf();
+    if(failed){ document.getElementById("ip").textContent=t("err.ip"); return; }
+    if(data){ set("vpnhint", vpnHint(data.timezone)); }
+  }
+
   fetch("/api/info",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+    data=d;
     var ipEl=document.getElementById("ip");
     ipEl.textContent=d.ip||"unknown";
     document.getElementById("family").textContent=(d.family||"")+(d.colo?" · via "+d.colo:"");
@@ -57,9 +68,12 @@ document.addEventListener("DOMContentLoaded", function () {
     measureLatency();
   }).catch(function(err){
     console.error("Failed to load IP info:", err);
+    failed=true;
     var ipEl=document.getElementById("ip");
-    ipEl.textContent=t("err.ip");
+    ipEl.textContent=tf()("err.ip");
     ipEl.style.color="#ef4444";
     ["isp","location","rdns","latency","connection","timezone","vpnhint"].forEach(function(n){set(n,null);});
   });
+
+  if (window.onWhatsipLang) window.onWhatsipLang(reI18n);
 });

@@ -148,6 +148,11 @@ function clientI18n() {
   function tr(k){ var d = DICT[lang] || DICT[DEFAULT]; return d[k]!=null ? d[k] : k; }
   window.getLang = function(){ return lang; };
   window.t = function(k){ return tr(k); };
+  // Page scripts register a re-render callback here so JS-generated content
+  // (tool grids, statuses, the IP fields) re-translates on a language toggle.
+  var langListeners = [];
+  window.onWhatsipLang = function(fn){ if (typeof fn === "function") langListeners.push(fn); };
+  function notify(){ for (var i=0;i<langListeners.length;i++){ try { langListeners[i](lang); } catch(e){} } }
   function apply(){
     var html = document.documentElement;
     html.setAttribute("lang", lang);
@@ -167,6 +172,7 @@ function clientI18n() {
       lang = (lang==="nl" ? "en" : "nl");
       try{ localStorage.setItem("lang", lang); }catch(e){}
       apply();
+      notify();
     });
   }
   function init(){ if(lang!==DEFAULT) apply(); wire(); }
