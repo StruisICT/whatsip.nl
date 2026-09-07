@@ -43,4 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
       finish("unsupported");
     }
   });
+
+  // Re-translate the state labels when the language is toggled.
+  if (window.onWhatsipLang) window.onWhatsipLang(function(){ if (done === names.length) render(); });
 });

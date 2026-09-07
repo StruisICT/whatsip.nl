@@ -98,4 +98,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initial render (IndexedDB will update async)
   renderResults();
+  if (window.onWhatsipLang) window.onWhatsipLang(renderResults);
 });
