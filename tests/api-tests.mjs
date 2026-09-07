@@ -87,52 +87,41 @@ await test("GET /api/headers returns JSON with headers", async () => {
   }
 });
 
-// Test root redirect
-await test("GET / redirects to /en/ or /nl/", async () => {
+// Root is served directly — no language redirect anymore.
+await test("GET / serves the home page directly (no redirect)", async () => {
   const res = await fetch(`${BASE_URL}/`, { redirect: "manual" });
-  if (res.status !== 302) throw new Error(`Expected 302, got ${res.status}`);
-  
-  const location = res.headers.get("location");
-  if (!location.match(/\/(en|nl)\/$/)) {
-    throw new Error(`Invalid redirect: ${location}`);
-  }
+  if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
+
+  const html = await res.text();
+  if (!html.includes('<html lang="en"')) throw new Error("Home is not baked English");
+  if (!html.includes("What is my IP")) throw new Error("Missing English content");
 });
 
-// Test language pages
-await test("GET /en/ returns English page", async () => {
-  const res = await fetch(`${BASE_URL}/en/`);
+// Flat tool page served directly.
+await test("GET /browser serves the browser page directly", async () => {
+  const res = await fetch(`${BASE_URL}/browser`, { redirect: "manual" });
+  if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
+  const html = await res.text();
+  if (!html.includes('data-i18n=')) throw new Error("Missing i18n hooks");
+});
+
+// Client-side i18n: the NL dictionary ships in /i18n.js.
+await test("GET /i18n.js carries both languages", async () => {
+  const res = await fetch(`${BASE_URL}/i18n.js`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  
-  const html = await res.text();
-  if (!html.includes('<html lang="en"')) {
-    throw new Error("Page is not English");
-  }
-  if (!html.includes("What is my IP")) {
-    throw new Error("Missing English content");
-  }
+  const js = await res.text();
+  if (!js.includes("What is my IP")) throw new Error("Missing EN strings");
+  if (!js.includes("Wat is mijn IP")) throw new Error("Missing NL strings");
 });
 
-await test("GET /nl/ returns Dutch page", async () => {
-  const res = await fetch(`${BASE_URL}/nl/`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  
+// Self-referential canonical (flat URL, no hreflang alternates).
+await test("Pages include a self-referential canonical", async () => {
+  const res = await fetch(`${BASE_URL}/browser`);
   const html = await res.text();
-  if (!html.includes('<html lang="nl"')) {
-    throw new Error("Page is not Dutch");
+  if (!/<link rel="canonical" href="[^"]*\/browser"/.test(html)) {
+    throw new Error("Missing/incorrect canonical for /browser");
   }
-  if (!html.includes("Wat is mijn IP")) {
-    throw new Error("Missing Dutch content");
-  }
-});
-
-// Test hreflang tags
-await test("Pages include proper hreflang tags", async () => {
-  const res = await fetch(`${BASE_URL}/en/browser`);
-  const html = await res.text();
-  
-  if (!html.includes('hreflang="en"')) throw new Error("Missing en hreflang");
-  if (!html.includes('hreflang="nl"')) throw new Error("Missing nl hreflang");
-  if (!html.includes('hreflang="x-default"')) throw new Error("Missing x-default");
+  if (html.includes('hreflang=')) throw new Error("Unexpected hreflang in flat structure");
 });
 
 // Test sitemap
@@ -143,8 +132,8 @@ await test("GET /sitemap.xml returns valid sitemap", async () => {
   const xml = await res.text();
   if (!xml.includes("<?xml")) throw new Error("Not XML");
   if (!xml.includes("<urlset")) throw new Error("Not a sitemap");
-  if (!xml.includes("/en/")) throw new Error("Missing /en/ URLs");
-  if (!xml.includes("/nl/")) throw new Error("Missing /nl/ URLs");
+  if (!xml.includes("whatsip.nl/ipv6")) throw new Error("Missing flat tool URLs");
+  if (xml.includes("/en/") || xml.includes("/nl/")) throw new Error("Unexpected localized URLs in sitemap");
 });
 
 // Test robots.txt

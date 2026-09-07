@@ -38,100 +38,76 @@ const browserMask = (page: Page) => [
 ];
 
 test.describe('Visual regression tests', () => {
-  
-  test.use({ viewport: { width: 1280, height: 720 } });
-  
-  test('homepage (English) - light theme', async ({ page }) => {
-    await page.goto('/en/');
-    
-    // Wait for IP to load to ensure consistent screenshot
-    await expect(page.locator('#ip')).not.toHaveText('…', { timeout: 5000 });
-    
-    // Set light theme explicitly
-    await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'light');
-    });
 
+  test.use({ viewport: { width: 1280, height: 720 } });
+
+  test('homepage (English) - light theme', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#ip')).not.toHaveText('…', { timeout: 5000 });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
     await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-en-light.png', { mask: homeMask(page) });
   });
-  
-  test('homepage (English) - dark theme', async ({ page }) => {
-    await page.goto('/en/');
-    await expect(page.locator('#ip')).not.toHaveText('…');
-    
-    // Set dark theme
-    await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    });
 
+  test('homepage (English) - dark theme', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#ip')).not.toHaveText('…');
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-en-dark.png', { mask: homeMask(page) });
   });
-  
-  test('homepage (Dutch)', async ({ page }) => {
-    await page.goto('/nl/');
+
+  test('homepage (Dutch via toggle)', async ({ page }) => {
+    await page.goto('/');
     await expect(page.locator('#ip')).not.toHaveText('…');
+    // Switch to Dutch client-side, then wait for the swap to land
+    await page.locator('#lang').click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'nl');
     await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-nl.png', { mask: homeMask(page) });
   });
-  
+
   test('browser page', async ({ page }) => {
-    await page.goto('/en/browser');
-    
-    // Wait for grid to populate
+    await page.goto('/browser');
     await expect(page.locator('#grid .field').first()).toBeVisible({ timeout: 3000 });
-    
     await expect(page).toHaveScreenshot('browser.png', { mask: browserMask(page) });
   });
-  
+
   test('headers page', async ({ page }) => {
-    await page.goto('/en/headers');
-    
-    // Wait for headers to load
+    await page.goto('/headers');
     await expect(page.locator('#grid .field').first()).toBeVisible({ timeout: 3000 });
-    
     await expect(page).toHaveScreenshot('headers.png');
   });
-  
-  test('WebRTC page', async ({ page }) => {
-    await page.goto('/en/webrtc');
-    
-    // Wait for the check to finish (status gets an ok/warn class when done);
-    // mask the detected addresses — candidate IPs/ports vary per run
-    await expect(page.locator('#status')).toHaveClass(/status-(ok|warn)/, { timeout: 10000 });
 
+  test('WebRTC page', async ({ page }) => {
+    await page.goto('/webrtc');
+    await expect(page.locator('#status')).toHaveClass(/status-(ok|warn)/, { timeout: 10000 });
     await expect(page).toHaveScreenshot('webrtc.png', { mask: [page.locator('#grid .v')] });
   });
-  
+
   test('IPv6 page', async ({ page }) => {
-    await page.goto('/en/ipv6');
-    
-    // Wait for detection
+    await page.goto('/ipv6');
     await page.waitForTimeout(2000);
-    
     await expect(page).toHaveScreenshot('ipv6.png');
   });
-  
+
   test('privacy page', async ({ page }) => {
-    await page.goto('/en/privacy');
+    await page.goto('/privacy');
     await expect(page).toHaveScreenshot('privacy.png');
   });
-  
+
   test('mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/en/');
+    await page.goto('/');
     await expect(page.locator('#ip')).not.toHaveText('…');
-
     await freezeDynamicFields(page);
     await expect(page).toHaveScreenshot('home-mobile.png', { mask: homeMask(page) });
   });
-  
+
   test('tablet viewport', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/en/browser');
+    await page.goto('/browser');
     await page.waitForTimeout(1000);
-    
     await expect(page).toHaveScreenshot('browser-tablet.png', { mask: browserMask(page) });
   });
 });

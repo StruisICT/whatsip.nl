@@ -3,19 +3,19 @@
   color-scheme: light dark;
   --bg: #ffffff; --surface: #f3f5f7; --border: #c4ccd4;
   --text: #14181c; --muted: #41505c; --accent: #0a5c2e; --accent-fg: #ffffff; --focus: #0a5c2e;
-  --warn: #6e4200; --nav-bg: rgba(255,255,255,0.85);
+  --warn: #6e4200; --danger: #990000; --nav-bg: rgba(255,255,255,0.85);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0b0f14; --surface: #161c24; --border: #2c3742;
     --text: #f0f4f8; --muted: #aebdc9; --accent: #5fe39b; --accent-fg: #08130c; --focus: #5fe39b;
-    --warn: #ffd479; --nav-bg: rgba(11,15,20,0.85);
+    --warn: #ffd479; --danger: #ff9d9d; --nav-bg: rgba(11,15,20,0.85);
   }
 }
 [data-theme="light"] { color-scheme: light;
-  --bg:#fff; --surface:#f3f5f7; --border:#c4ccd4; --text:#14181c; --muted:#41505c; --accent:#0a5c2e; --accent-fg:#fff; --focus:#0a5c2e; --nav-bg:rgba(255,255,255,.85); }
+  --bg:#fff; --surface:#f3f5f7; --border:#c4ccd4; --text:#14181c; --muted:#41505c; --accent:#0a5c2e; --accent-fg:#fff; --focus:#0a5c2e; --warn:#6e4200; --danger:#990000; --nav-bg:rgba(255,255,255,.85); }
 [data-theme="dark"] { color-scheme: dark;
-  --bg:#0b0f14; --surface:#161c24; --border:#2c3742; --text:#f0f4f8; --muted:#aebdc9; --accent:#5fe39b; --accent-fg:#08130c; --focus:#5fe39b; --nav-bg:rgba(11,15,20,.85); }
+  --bg:#0b0f14; --surface:#161c24; --border:#2c3742; --text:#f0f4f8; --muted:#aebdc9; --accent:#5fe39b; --accent-fg:#08130c; --focus:#5fe39b; --warn:#ffd479; --danger:#ff9d9d; --nav-bg:rgba(11,15,20,.85); }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; overflow-x: hidden; }
@@ -105,6 +105,9 @@ details pre { margin: 0; padding: 0 1rem 1rem; overflow-x: auto; font-size: 0.85
 
 .status-ok { color: var(--accent); font-weight: 700; }
 .status-warn { color: var(--warn); font-weight: 700; }
+/* Result state colours for tool fields (theme-aware, WCAG AA contrast). */
+.field .v.ok { color: var(--accent); }
+.field .v.bad { color: var(--danger); }
 .status-line { font-size: 1.05rem; margin: 0; }
 footer { max-width: 760px; width: 100%; margin: 0 auto; padding: 1.5rem 1.25rem 2rem; color: var(--muted); font-size: 0.88rem; text-align: center; }
 footer .copyright { display: inline-block; margin-top: 0.5rem; font-size: 0.8rem; }

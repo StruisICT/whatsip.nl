@@ -1,16 +1,17 @@
 # 🚀 whatsip.nl — status
 
 **Live:** https://whatsip.nl · **Deploy:** Cloudflare Pages (auto-deploy from `main`)
-**Last updated:** 2026-07-05
+**Last updated:** 2026-09-07
 
 ---
 
 ## Site at a glance
 
-- **22 pages** total — 11 pages × 2 languages (EN / NL)
-- **Sitemap:** https://whatsip.nl/sitemap.xml (22 URLs, hreflang + lastmod)
+- **11 pages** total — one **flat URL each** (`/`, `/ipv6`, `/browser`, …); no `/en//nl/` split, no redirects
+- **Language:** switched **client-side** (EN/NL toggle + `navigator.language` auto-detect); baked language per URL is EN
+- **Sitemap:** https://whatsip.nl/sitemap.xml (11 URLs + lastmod)
 - **First visit:** ~15 KB; later pages mostly cached
-- **Edge response:** <100 ms globally (Cloudflare)
+- **Edge response:** <100 ms globally (Cloudflare); `/` served directly (no language hop)
 - **No cookies, no tracking, no ads, IP never stored**
 
 ---
@@ -44,15 +45,16 @@
 ## Infrastructure
 
 - **Cloudflare Pages**, build `node scripts/build.mjs`, output `dist/`
-- **Edge functions:** `/ip`, `/api/info`, `/api/headers`, `/` (Accept-Language redirect)
+- **Edge functions:** `/ip`, `/api/info`, `/api/headers` (no root router — `/` serves `index.html` directly)
 - **DNS zone** `whatsip.nl` (id `4e0018cc99e8b56fe2133a41d463d829`): apex, `www` (→ apex 301), `ipv4`, `ipv6`, mail/TXT. (Old `test1-5` records removed.)
-- **Build:** `src/` templates + `strings.json` → 22 localized pages + per-language `i18n.en.js`/`i18n.nl.js` + `sitemap.xml`
+- **Build:** `src/` templates + `strings.json` → 11 flat pages + one `i18n.js` (full NL/EN dict + in-place toggle) + `sitemap.xml`
 
 ---
 
 ## SEO
 
-- Keyword-tuned titles/descriptions, Schema.org `WebApplication`, hreflang (en/nl/x-default), sitemap submitted to Google Search Console
+- Keyword-tuned titles/descriptions, Schema.org `WebApplication`, self-referential canonical per flat URL, sitemap submitted to Google Search Console
+- **Language & SEO:** flat URLs with client-side EN/NL switching — Google indexes the baked language (EN) per URL (Sept 2026: dropped the `/en//nl/` split + Accept-Language redirect to eliminate the per-visit redirect; old localized URLs 301 to flat paths)
 - **No monetisation.** AdSense was removed entirely on 2026-07-05 after a second rejection — no ad scripts, no `ads.txt`, CSP tightened back to self-only.
 
 ---

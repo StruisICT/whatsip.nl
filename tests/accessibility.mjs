@@ -7,13 +7,17 @@ import { AxeBuilder } from '@axe-core/playwright';
 
 const BASE_URL = process.env.TEST_URL || 'https://whatsip.nl';
 const PAGES = [
-  '/en/',
-  '/en/browser',
-  '/en/headers',
-  '/en/webrtc',
-  '/en/ipv6',
-  '/en/privacy',
-  '/nl/',
+  '/',
+  '/ipv6',
+  '/browser',
+  '/headers',
+  '/webrtc',
+  '/storage',
+  '/geolocation',
+  '/permissions',
+  '/api',
+  '/about',
+  '/privacy',
 ];
 
 let totalViolations = 0;

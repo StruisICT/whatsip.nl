@@ -1,6 +1,6 @@
 /**
  * Link checker
- * Verify all internal links work, check external links (with caching)
+ * Verify all internal links resolve to a built file (flat structure).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,8 +10,14 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(ROOT, "dist");
 const BASE_URL = process.env.TEST_URL || "https://whatsip.nl";
 
-const LANGS = ["en", "nl"];
-const PAGES = ["index.html", "browser.html", "headers.html", "webrtc.html", "ipv6.html", "privacy.html"];
+const PAGES = [
+  "index.html", "ipv6.html", "browser.html", "headers.html", "webrtc.html",
+  "storage.html", "geolocation.html", "permissions.html", "api.html",
+  "about.html", "privacy.html",
+];
+
+// Edge-function paths that have no file in dist/ — never treat as broken.
+const FUNCTION_PATHS = ["/ip", "/api/"];
 
 let errors = 0;
 
@@ -19,7 +25,7 @@ function extractLinks(html) {
   const links = [];
   const hrefRegex = /href="([^"]+)"/g;
   const srcRegex = /src="([^"]+)"/g;
-  
+
   let match;
   while ((match = hrefRegex.exec(html)) !== null) {
     links.push({ type: "href", url: match[1] });
@@ -27,7 +33,7 @@ function extractLinks(html) {
   while ((match = srcRegex.exec(html)) !== null) {
     links.push({ type: "src", url: match[1] });
   }
-  
+
   return links;
 }
 
@@ -35,58 +41,50 @@ function isInternal(url) {
   return url.startsWith("/") || url.startsWith(BASE_URL);
 }
 
-function resolveInternalPath(url, lang) {
-  // Remove BASE_URL prefix if present, plus cache-busting query / fragment
-  let cleanUrl = url.replace(BASE_URL, "").replace(/[?#].*$/, "");
+function resolveInternalPath(url) {
+  // Strip origin, cache-busting query, and fragment.
+  const cleanUrl = url.replace(BASE_URL, "").replace(/[?#].*$/, "");
 
-  // Handle root
-  if (cleanUrl === "/" || cleanUrl === "") return path.join(DIST, lang, "index.html");
-  
-  // Handle language prefixes
-  if (cleanUrl.startsWith("/en/") || cleanUrl.startsWith("/nl/")) {
-    const parts = cleanUrl.split("/").filter(Boolean);
-    const targetLang = parts[0];
-    const page = parts[1] || "index";
-    return path.join(DIST, targetLang, page === "" || page === "/" ? "index.html" : `${page}.html`);
-  }
-  
-  // Shared assets
+  if (cleanUrl === "/" || cleanUrl === "") return path.join(DIST, "index.html");
+
   if (cleanUrl.startsWith("/")) {
-    return path.join(DIST, cleanUrl.substring(1));
+    // Edge functions have no static file — skip.
+    if (FUNCTION_PATHS.some((p) => cleanUrl === p || cleanUrl.startsWith(p))) return null;
+    const rel = cleanUrl.substring(1);
+    // A path with an extension is a static asset; otherwise it's a page → <slug>.html
+    return path.join(DIST, rel.includes(".") ? rel : `${rel}.html`);
   }
-  
+
   return null;
 }
 
 console.log("Checking links...\n");
 
-for (const lang of LANGS) {
-  for (const page of PAGES) {
-    const filePath = path.join(DIST, lang, page);
-    const html = fs.readFileSync(filePath, "utf8");
-    const links = extractLinks(html);
-    
-    for (const link of links) {
-      // Skip special protocols
-      if (link.url.startsWith("mailto:") || 
-          link.url.startsWith("tel:") || 
-          link.url.startsWith("#") ||
-          link.url.startsWith("about:") ||
-          link.url.startsWith("data:")) {
-        continue;
+for (const page of PAGES) {
+  const filePath = path.join(DIST, page);
+  const html = fs.readFileSync(filePath, "utf8");
+  const links = extractLinks(html);
+
+  for (const link of links) {
+    // Skip special protocols
+    if (link.url.startsWith("mailto:") ||
+        link.url.startsWith("tel:") ||
+        link.url.startsWith("#") ||
+        link.url.startsWith("about:") ||
+        link.url.startsWith("data:")) {
+      continue;
+    }
+
+    if (isInternal(link.url)) {
+      const targetPath = resolveInternalPath(link.url);
+      if (targetPath && !fs.existsSync(targetPath)) {
+        console.error(`✗ /${page}: broken internal link "${link.url}" (${link.type})`);
+        errors++;
       }
-      
-      if (isInternal(link.url)) {
-        const targetPath = resolveInternalPath(link.url, lang);
-        if (targetPath && !fs.existsSync(targetPath)) {
-          console.error(`✗ /${lang}/${page}: broken internal link "${link.url}" (${link.type})`);
-          errors++;
-        }
-      }
-      // External links: just check they're HTTPS (full check is slow)
-      else if (link.url.startsWith("http://") && !link.url.includes("localhost")) {
-        console.warn(`⚠ /${lang}/${page}: insecure external link "${link.url}"`);
-      }
+    }
+    // External links: just check they're HTTPS (full check is slow)
+    else if (link.url.startsWith("http://") && !link.url.includes("localhost")) {
+      console.warn(`⚠ /${page}: insecure external link "${link.url}"`);
     }
   }
 }

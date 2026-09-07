@@ -9,9 +9,13 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(ROOT, "dist");
 
-const LANGS = ["en", "nl"];
-const PAGES = ["index.html", "browser.html", "headers.html", "webrtc.html", "ipv6.html", "privacy.html"];
-const ASSETS = ["style.css", "app.js", "i18n.en.js", "i18n.nl.js", "robots.txt", "sitemap.xml", "_headers", "_redirects"];
+// Flat structure: one HTML per page at the dist root (no /en//nl/ dirs).
+const PAGES = [
+  "index.html", "ipv6.html", "browser.html", "headers.html", "webrtc.html",
+  "storage.html", "geolocation.html", "permissions.html", "api.html",
+  "about.html", "privacy.html",
+];
+const ASSETS = ["style.css", "app.js", "i18n.js", "robots.txt", "sitemap.xml", "_headers", "_redirects"];
 
 let errors = 0;
 
@@ -34,20 +38,18 @@ test("dist/ directory exists", () => {
   if (!fs.existsSync(DIST)) throw new Error("dist/ not found");
 });
 
-// Test 2: All language directories exist
-LANGS.forEach(lang => {
-  test(`Language directory /${lang}/ exists`, () => {
-    fileExists(path.join(DIST, lang));
+// Test 2: All pages exist at the flat root
+PAGES.forEach(page => {
+  test(`Page /${page} exists`, () => {
+    fileExists(path.join(DIST, page));
   });
 });
 
-// Test 3: All pages exist for each language
-LANGS.forEach(lang => {
-  PAGES.forEach(page => {
-    test(`Page /${lang}/${page} exists`, () => {
-      fileExists(path.join(DIST, lang, page));
-    });
-  });
+// Test 3: No legacy language directories remain
+test("no /en or /nl directories", () => {
+  for (const lang of ["en", "nl"]) {
+    if (fs.existsSync(path.join(DIST, lang))) throw new Error(`Unexpected /${lang}/ directory`);
+  }
 });
 
 // Test 4: All shared assets exist
@@ -57,24 +59,21 @@ ASSETS.forEach(asset => {
   });
 });
 
-// Test 5: Pages have minimum content
-LANGS.forEach(lang => {
-  test(`/${lang}/index.html has content`, () => {
-    const content = fs.readFileSync(path.join(DIST, lang, "index.html"), "utf8");
-    if (content.length < 1000) throw new Error("Page too small");
-    if (!content.includes("<!doctype html")) throw new Error("Missing doctype");
-    if (!content.includes(`<html lang="${lang}"`)) throw new Error(`Wrong lang attribute`);
-  });
+// Test 5: Home page has content and the baked language attribute
+test("index.html has content", () => {
+  const content = fs.readFileSync(path.join(DIST, "index.html"), "utf8");
+  if (content.length < 1000) throw new Error("Page too small");
+  if (!content.includes("<!doctype html")) throw new Error("Missing doctype");
+  if (!content.includes(`<html lang="en"`)) throw new Error("Wrong/ missing lang attribute");
 });
 
-// Test 6: Sitemap contains all URLs
+// Test 6: Sitemap contains one URL per built page
 test("sitemap.xml contains all pages", () => {
   const sitemap = fs.readFileSync(path.join(DIST, "sitemap.xml"), "utf8");
-  const builtPages = fs.readdirSync(path.join(DIST, "en")).filter((f) => f.endsWith(".html")).length;
-  const expectedCount = LANGS.length * builtPages;
+  const builtPages = fs.readdirSync(DIST).filter((f) => f.endsWith(".html")).length;
   const urlCount = (sitemap.match(/<loc>/g) || []).length;
-  if (urlCount !== expectedCount) {
-    throw new Error(`Expected ${expectedCount} URLs, found ${urlCount}`);
+  if (urlCount !== builtPages) {
+    throw new Error(`Expected ${builtPages} URLs, found ${urlCount}`);
   }
 });
 
@@ -84,9 +83,9 @@ test("robots.txt references sitemap", () => {
   if (!robots.includes("Sitemap:")) throw new Error("No sitemap reference");
 });
 
-// Test 8: AdSense script in pages
+// Test 8: no ad scripts in pages
 test("no ad scripts in pages", () => {
-  const content = fs.readFileSync(path.join(DIST, "en", "index.html"), "utf8");
+  const content = fs.readFileSync(path.join(DIST, "index.html"), "utf8");
   if (content.includes("googlesyndication.com") || content.includes("adsbygoogle")) {
     throw new Error("Unexpected ad script found");
   }
@@ -98,13 +97,12 @@ test("style.css has content", () => {
   if (css.length < 1000) throw new Error("CSS file too small");
 });
 
-// Test 10: per-language i18n bundles generated
-test("i18n bundles contain translations", () => {
-  const en = fs.readFileSync(path.join(DIST, "i18n.en.js"), "utf8");
-  const nl = fs.readFileSync(path.join(DIST, "i18n.nl.js"), "utf8");
-  if (!en.includes("window.t") || !nl.includes("window.t")) throw new Error("Missing t() function");
-  if (!en.includes("What is my IP")) throw new Error("Missing EN translations");
-  if (!nl.includes("Wat is mijn IP")) throw new Error("Missing NL translations");
+// Test 10: single i18n bundle carries both languages + t()
+test("i18n bundle contains both languages", () => {
+  const js = fs.readFileSync(path.join(DIST, "i18n.js"), "utf8");
+  if (!js.includes("window.t")) throw new Error("Missing t() function");
+  if (!js.includes("What is my IP")) throw new Error("Missing EN translations");
+  if (!js.includes("Wat is mijn IP")) throw new Error("Missing NL translations");
 });
 
 console.log(`\n${errors === 0 ? "✓" : "✗"} Build validation: ${errors === 0 ? "PASSED" : `FAILED (${errors} errors)`}`);

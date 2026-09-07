@@ -2,13 +2,13 @@ document.addEventListener("DOMContentLoaded", function () {
   var t = window.t || function (k) { return k; };
   function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
   function row(name, state) {
-    var color = state === "granted" ? "color:#10b981" : state === "denied" ? "color:#ef4444" : "";
+    var cls = state === "granted" ? " ok" : state === "denied" ? " bad" : "";
     var icon = state === "granted" ? "✓ " : state === "denied" ? "✗ " : "";
     var label = state === "granted" ? t("perm.granted")
       : state === "denied" ? t("perm.denied")
       : state === "prompt" ? t("perm.prompt")
       : t("perm.unsupported");
-    return '<div class="field"><div class="k">' + esc(name) + '</div><div class="v" style="' + color + '">' + icon + esc(label) + "</div></div>";
+    return '<div class="field"><div class="k">' + esc(name) + '</div><div class="v' + cls + '">' + icon + esc(label) + "</div></div>";
   }
 
   var grid = document.getElementById("grid");
