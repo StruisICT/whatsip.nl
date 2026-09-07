@@ -7,7 +7,7 @@ import lighthouse from 'lighthouse';
 import { chromium } from '@playwright/test';
 
 const BASE_URL = process.env.TEST_URL || 'https://whatsip.nl';
-const PAGES = ['/en/', '/en/browser'];
+const PAGES = ['/', '/browser'];
 const REPORT_DIR = 'lighthouse-reports';
 // Lighthouse talks CDP directly, so Chromium must expose a debugging port —
 // Playwright's own connection uses a pipe and doesn't provide one.

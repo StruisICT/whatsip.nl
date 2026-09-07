@@ -7,11 +7,11 @@ import https from 'node:https';
 import { performance } from 'node:perf_hooks';
 
 const PAGES = [
-  { name: 'Homepage', url: 'https://whatsip.nl/en/' },
-  { name: 'Browser Info', url: 'https://whatsip.nl/en/browser' },
-  { name: 'Storage Test', url: 'https://whatsip.nl/en/storage' },
-  { name: 'Geolocation', url: 'https://whatsip.nl/en/geolocation' },
-  { name: 'Headers', url: 'https://whatsip.nl/en/headers' },
+  { name: 'Homepage', url: 'https://whatsip.nl/' },
+  { name: 'Browser Info', url: 'https://whatsip.nl/browser' },
+  { name: 'Storage Test', url: 'https://whatsip.nl/storage' },
+  { name: 'Geolocation', url: 'https://whatsip.nl/geolocation' },
+  { name: 'Headers', url: 'https://whatsip.nl/headers' },
 ];
 
 const APIS = [
@@ -85,8 +85,7 @@ console.log('─'.repeat(60));
 const assets = [
   { name: 'CSS', url: 'https://whatsip.nl/style.css' },
   { name: 'JavaScript', url: 'https://whatsip.nl/app.js' },
-  { name: 'i18n (EN)', url: 'https://whatsip.nl/i18n.en.js' },
-  { name: 'i18n (NL)', url: 'https://whatsip.nl/i18n.nl.js' },
+  { name: 'i18n', url: 'https://whatsip.nl/i18n.js' },
   { name: 'Favicon', url: 'https://whatsip.nl/favicon.svg' },
   { name: 'Manifest', url: 'https://whatsip.nl/manifest.json' },
   { name: 'Service Worker', url: 'https://whatsip.nl/sw.js' },
@@ -118,7 +117,7 @@ console.log('\n🔒 Security Headers:');
 console.log('─'.repeat(60));
 
 await new Promise((resolve) => {
-  https.get('https://whatsip.nl/en/', (res) => {
+  https.get('https://whatsip.nl/', (res) => {
     const headers = res.headers;
     const checks = [
       { name: 'HSTS', header: 'strict-transport-security', expected: 'max-age' },
@@ -150,5 +149,5 @@ console.log('\n✅ Site is performing optimally!\n');
 
 // 6. PageSpeed Insights suggestion
 console.log('💡 For detailed Core Web Vitals analysis:');
-console.log('   https://pagespeed.web.dev/analysis?url=https://whatsip.nl/en/');
+console.log('   https://pagespeed.web.dev/analysis?url=https://whatsip.nl/');
 console.log('\n' + '═'.repeat(60) + '\n');

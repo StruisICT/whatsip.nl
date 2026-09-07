@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function field(k,v,status){
     if(v===null||v===undefined||v==="")return"";
     var icon = status === "yes" ? "✓" : status === "no" ? "✗" : "";
-    var color = status === "yes" ? "color:#10b981" : status === "no" ? "color:#ef4444" : "";
-    return '<div class="field"><div class="k">'+k+'</div><div class="v" style="'+color+'">'+icon+' '+esc(v)+"</div></div>";
+    var cls = status === "yes" ? " ok" : status === "no" ? " bad" : "";
+    return '<div class="field"><div class="k">'+k+'</div><div class="v'+cls+'">'+icon+' '+esc(v)+"</div></div>";
   }
 
   // Test Cookies

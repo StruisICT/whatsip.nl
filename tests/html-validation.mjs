@@ -24,21 +24,24 @@ const htmlvalidate = new HtmlValidate({
   },
 });
 
-const LANGS = ["en", "nl"];
-const PAGES = ["index.html", "browser.html", "headers.html", "webrtc.html", "ipv6.html", "privacy.html"];
+const PAGES = [
+  "index.html", "ipv6.html", "browser.html", "headers.html", "webrtc.html",
+  "storage.html", "geolocation.html", "permissions.html", "api.html",
+  "about.html", "privacy.html",
+];
 
 let totalErrors = 0;
 let totalWarnings = 0;
 
 console.log("Validating HTML files...\n");
 
-for (const lang of LANGS) {
-  for (const page of PAGES) {
-    const filePath = path.join(DIST, lang, page);
+for (const page of PAGES) {
+  {
+    const filePath = path.join(DIST, page);
     const report = await htmlvalidate.validateFile(filePath);
 
     if (!report.valid) {
-      console.log(`✗ /${lang}/${page}:`);
+      console.log(`✗ /${page}:`);
       const messages = report.results[0]?.messages || [];
       for (const msg of messages) {
         if (msg.severity === 2) {
@@ -50,7 +53,7 @@ for (const lang of LANGS) {
         }
       }
     } else {
-      console.log(`✓ /${lang}/${page}`);
+      console.log(`✓ /${page}`);
     }
   }
 }

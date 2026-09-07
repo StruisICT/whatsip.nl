@@ -1,15 +1,20 @@
 # Cloudflare Pages redirects.
-# Root (/) is handled by functions/index.ts (Accept-Language -> /en/ or /nl/).
-# Static pages (/en/*, /nl/*) and functions (/ip, /api/*) are served directly.
-# No catch-all needed with the localized structure.
+# Sept 2026: the site is now FLAT (/, /ipv6, /browser, ...) with client-side
+# language switching. There is no language router and no per-visit redirect.
+# Pages (/*.html) and functions (/ip, /api/*) are served directly.
 
 # Redirect www to apex domain (must configure www.whatsip.nl as custom domain in Cloudflare Pages)
 https://www.whatsip.nl/* https://whatsip.nl/:splat 301
 
-# Pages removed in the July 2026 trim (were indexed; keep 301s)
-/en/dns /en/ 301
-/nl/dns /nl/ 301
-/en/speed /en/ 301
-/nl/speed /nl/ 301
-/en/faq /en/about 301
-/nl/faq /nl/about 301
+# Legacy pages removed in the July 2026 trim (were indexed)
+/en/faq /about 301
+/nl/faq /about 301
+/en/dns / 301
+/nl/dns / 301
+/en/speed / 301
+/nl/speed / 301
+
+# Legacy localized URLs (/en/*, /nl/*) -> flat path. One-time for old inbound
+# links / search results; normal navigation never hits these.
+/en/* /:splat 301
+/nl/* /:splat 301

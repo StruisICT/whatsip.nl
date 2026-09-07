@@ -1,7 +1,13 @@
 // Static site generator for whatsip.nl.
 // Reads src/strings.json (single source of NL/EN copy) + src/pages/*.{html,js}
-// and emits a localized static site to dist/:  dist/en/*, dist/nl/* + shared
-// assets and a generated /i18n.js (client t() for JS-rendered labels) + sitemap.
+// and emits a FLAT static site to dist/:  dist/*.html at root paths (no /en//nl/
+// dirs, no language router) + shared assets + a generated /i18n.js (full NL/EN
+// dictionary + client-side language toggle) + sitemap.
+//
+// Text is baked in a default language (BAKE); every {{t:key}} becomes a
+// <span data-i18n="key"> so /i18n.js can swap the whole page to the other
+// language in-place (no reload). This keeps the URL structure flat and
+// redirect-free; Google indexes the baked language per URL.
 //
 // No dependencies. Run: node scripts/build.mjs
 import fs from "node:fs";
@@ -13,6 +19,7 @@ const SRC = path.join(ROOT, "src");
 const DIST = path.join(ROOT, "dist");
 const ORIGIN = "https://whatsip.nl";
 const LANGS = ["en", "nl"];
+const BAKE = "en"; // language baked into the HTML (indexed by search engines)
 const BUILD_VERSION = Date.now();
 
 const STR = JSON.parse(fs.readFileSync(path.join(SRC, "strings.json"), "utf8"));
@@ -35,32 +42,30 @@ const NAV = PAGES.filter((p) => p.nav);
 
 const read = (p) => fs.readFileSync(path.join(SRC, p), "utf8");
 const attr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+// Flat path for a slug: "" -> "/", "ipv6" -> "/ipv6".
+const pathFor = (slug) => "/" + slug;
 
-function head(lang, page) {
-  const S = STR[lang];
-  const url = (l) => `${ORIGIN}/${l}/${page.slug}`;
+function head(page) {
+  const S = STR[BAKE];
+  const url = `${ORIGIN}${pathFor(page.slug)}`;
   return `<head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>${S[page.title]}</title>
   <meta name="description" content="${attr(S[page.desc])}" />
-  <link rel="canonical" href="${url(lang)}" />
-  <link rel="alternate" hreflang="en" href="${url("en")}" />
-  <link rel="alternate" hreflang="nl" href="${url("nl")}" />
-  <link rel="alternate" hreflang="x-default" href="${url("en")}" />
+  <link rel="canonical" href="${url}" />
   <meta name="theme-color" content="#0b0f14" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${url(lang)}" />
+  <meta property="og:url" content="${url}" />
   <meta property="og:title" content="${attr(S[page.title])}" />
   <meta property="og:description" content="${attr(S[page.desc])}" />
   <meta property="og:image" content="${ORIGIN}/favicon.svg" />
   <meta property="og:site_name" content="whatsip.nl" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:url" content="${url(lang)}" />
+  <meta name="twitter:url" content="${url}" />
   <meta name="twitter:title" content="${attr(S[page.title])}" />
   <meta name="twitter:description" content="${attr(S[page.desc])}" />
-  <meta name="twitter:image" content="${ORIGIN}/favicon.svg" />
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="manifest" href="/manifest.json" />
@@ -78,68 +83,101 @@ function head(lang, page) {
     "inLanguage": ["en", "nl"]
   }
   </script>
-  <script defer src="/i18n.${lang}.js?v=${BUILD_VERSION}"></script>
+  <script defer src="/i18n.js?v=${BUILD_VERSION}"></script>
   <script defer src="/app.js?v=${BUILD_VERSION}"></script>
 </head>`;
 }
 
-function nav(lang, slug) {
-  const S = STR[lang];
-  const other = lang === "en" ? "nl" : "en";
+// Wrap a translatable label so /i18n.js can swap it in place.
+const T = (key) => `<span data-i18n="${key}">${STR[BAKE][key]}</span>`;
+
+function nav(slug) {
+  const S = STR[BAKE];
   const tabs = NAV.map((it) => {
     const cur = it.slug === slug ? ' aria-current="page"' : "";
-    return `<a href="/${lang}/${it.slug}"${cur}>${S[it.nav]}</a>`;
+    return `<a href="${pathFor(it.slug)}"${cur}>${T(it.nav)}</a>`;
   }).join("\n      ");
   return `<header class="nav">
-    <a class="brand" href="/${lang}/">whatsip<span>.nl</span></a>
+    <a class="brand" href="/">whatsip<span>.nl</span></a>
     <nav class="tabs" aria-label="Tools">
       ${tabs}
     </nav>
-    <a class="theme-btn" href="/${other}/${slug}" aria-label="${attr(S["aria.lang"])}">${other.toUpperCase()}</a>
-    <button class="theme-btn" id="theme" type="button" aria-label="${attr(S["aria.theme"])}">🌓</button>
+    <button class="theme-btn" id="lang" type="button" data-i18n-aria="aria.lang" aria-label="${attr(S["aria.lang"])}">NL</button>
+    <button class="theme-btn" id="theme" type="button" data-i18n-aria="aria.theme" aria-label="${attr(S["aria.theme"])}">🌓</button>
   </header>`;
 }
 
-function footer(lang, slug) {
-  const S = STR[lang];
-  const note = slug === "" ? S["footer.privacyNote"] : S["footer.note"];
-  return `<footer><span>${note}</span> &nbsp;·&nbsp; <a href="/${lang}/api">${S["footer.api"]}</a> &nbsp;·&nbsp; <a href="/${lang}/about">${S["footer.about"]}</a> &nbsp;·&nbsp; <a href="/${lang}/privacy">${S["footer.privacy"]}</a><br /><span class="copyright">© <a href="https://struisict.com" rel="noopener">Struisict.com</a></span></footer>`;
+function footer(slug) {
+  const noteKey = slug === "" ? "footer.privacyNote" : "footer.note";
+  return `<footer><span>${T(noteKey)}</span> &nbsp;·&nbsp; <a href="/api">${T("footer.api")}</a> &nbsp;·&nbsp; <a href="/about">${T("footer.about")}</a> &nbsp;·&nbsp; <a href="/privacy">${T("footer.privacy")}</a><br /><span class="copyright">© <a href="https://struisict.com" rel="noopener">Struisict.com</a></span></footer>`;
 }
 
-function renderPage(lang, page) {
-  const S = STR[lang];
+function renderPage(page) {
+  const S = STR[BAKE];
   let frag = read(`pages/${page.frag}.html`)
-    .replace(/\{\{base\}\}/g, `/${lang}/`)
-    .replace(/\{\{t:([^}]+)\}\}/g, (_, k) => (k in S ? S[k] : `«${k}»`));
+    .replace(/\{\{base\}\}/g, `/`)
+    .replace(/\{\{t:([^}]+)\}\}/g, (_, k) => (k in S ? `<span data-i18n="${k}">${S[k]}</span>` : `«${k}»`));
   let scriptTag = "";
   if (page.script) {
     scriptTag = `\n  <script>\n${read(`pages/${page.script}.js`)}  </script>`;
   }
   return `<!doctype html>
-<html lang="${lang}">
-${head(lang, page)}
+<html lang="${BAKE}" data-i18n-title="${page.title}" data-i18n-desc="${page.desc}">
+${head(page)}
 <body>
-  ${nav(lang, page.slug)}
+  ${nav(page.slug)}
   ${frag.trim()}
-  ${footer(lang, page.slug)}${scriptTag}
+  ${footer(page.slug)}${scriptTag}
 </body>
 </html>
 `;
 }
 
-function clientI18n(lang) {
-  // Per-language bundle: a page loads only its own strings (half the payload).
-  // Safe because build-time parity check guarantees all languages share keys.
+// Single client bundle: the full dictionary + t()/getLang() for JS-rendered
+// labels + an in-place language swap driven by [data-i18n]/[data-i18n-aria]
+// hooks, the #lang toggle, and <title>/meta description. No page reload.
+function clientI18n() {
   return `(function(){
-  var T = ${JSON.stringify(STR[lang])};
-  window.getLang = function(){ return ${JSON.stringify(lang)}; };
-  window.t = function(k){ return (T[k] != null ? T[k] : k); };
+  var DICT = ${JSON.stringify(STR)};
+  var DEFAULT = ${JSON.stringify(BAKE)};
+  function pref(){
+    try{ var s = localStorage.getItem("lang"); if(s==="en"||s==="nl") return s; }catch(e){}
+    return (navigator.language||navigator.userLanguage||"").toLowerCase().indexOf("nl")===0 ? "nl" : "en";
+  }
+  var lang = pref();
+  function tr(k){ var d = DICT[lang] || DICT[DEFAULT]; return d[k]!=null ? d[k] : k; }
+  window.getLang = function(){ return lang; };
+  window.t = function(k){ return tr(k); };
+  function apply(){
+    var html = document.documentElement;
+    html.setAttribute("lang", lang);
+    var els = document.querySelectorAll("[data-i18n]");
+    for (var i=0;i<els.length;i++){ var v = tr(els[i].getAttribute("data-i18n")); if(v!=null) els[i].innerHTML = v; }
+    var ar = document.querySelectorAll("[data-i18n-aria]");
+    for (var j=0;j<ar.length;j++){ ar[j].setAttribute("aria-label", tr(ar[j].getAttribute("data-i18n-aria"))); }
+    var tk = html.getAttribute("data-i18n-title"); if(tk) document.title = tr(tk);
+    var dk = html.getAttribute("data-i18n-desc"); if(dk){ var m = document.querySelector('meta[name="description"]'); if(m) m.setAttribute("content", tr(dk)); }
+    var lb = document.getElementById("lang"); if(lb) lb.textContent = (lang==="nl" ? "EN" : "NL");
+  }
+  function wire(){
+    var lb = document.getElementById("lang");
+    if(!lb) return;
+    lb.textContent = (lang==="nl" ? "EN" : "NL");
+    lb.addEventListener("click", function(){
+      lang = (lang==="nl" ? "en" : "nl");
+      try{ localStorage.setItem("lang", lang); }catch(e){}
+      apply();
+    });
+  }
+  function init(){ if(lang!==DEFAULT) apply(); wire(); }
+  if(document.readyState !== "loading") init();
+  else document.addEventListener("DOMContentLoaded", init);
 })();
 `;
 }
 
-// Guarantee every language defines exactly the same keys, so per-language
-// i18n bundles never miss a runtime label.
+// Guarantee every language defines exactly the same keys, so the swap never
+// misses a label.
 function assertStringParity() {
   const ref = Object.keys(STR.en).sort();
   for (const lang of LANGS) {
@@ -148,7 +186,7 @@ function assertStringParity() {
     const missing = ref.filter((k) => !(k in STR[lang]));
     const extra = keys.filter((k) => !(k in STR.en));
     if (missing.length || extra.length) {
-      console.error(`\u274c i18n parity error for "${lang}":`);
+      console.error(`❌ i18n parity error for "${lang}":`);
       if (missing.length) console.error(`   missing: ${missing.join(", ")}`);
       if (extra.length) console.error(`   extra:   ${extra.join(", ")}`);
       process.exit(1);
@@ -157,15 +195,12 @@ function assertStringParity() {
 }
 
 function sitemap() {
-  const lastmod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const alts = (slug) =>
-    LANGS.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${ORIGIN}/${l}/${slug}"/>`).join("") +
-    `<xhtml:link rel="alternate" hreflang="x-default" href="${ORIGIN}/en/${slug}"/>`;
-  const urls = PAGES.flatMap((p) =>
-    LANGS.map((l) => `  <url><loc>${ORIGIN}/${l}/${p.slug}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>${p.slug === '' ? '1.0' : '0.8'}</priority>${alts(p.slug)}</url>`),
+  const lastmod = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  const urls = PAGES.map(
+    (p) => `  <url><loc>${ORIGIN}${pathFor(p.slug)}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>${p.slug === "" ? "1.0" : "0.8"}</priority></url>`,
   ).join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
 </urlset>
 `;
@@ -176,9 +211,9 @@ import { execSync } from "node:child_process";
 
 function validateJavaScript() {
   const jsFiles = fs.readdirSync(path.join(SRC, "pages"))
-    .filter(f => f.endsWith(".js"))
-    .map(f => path.join(SRC, "pages", f));
-  
+    .filter((f) => f.endsWith(".js"))
+    .map((f) => path.join(SRC, "pages", f));
+
   for (const file of jsFiles) {
     try {
       execSync(`node --check "${file}"`, { encoding: "utf8", stdio: "pipe" });
@@ -191,19 +226,15 @@ function validateJavaScript() {
 }
 
 validateJavaScript();
+assertStringParity();
 
 // ---- build ----
 fs.rmSync(DIST, { recursive: true, force: true });
-for (const lang of LANGS) {
-  fs.mkdirSync(path.join(DIST, lang), { recursive: true });
-  for (const page of PAGES) {
-    fs.writeFileSync(path.join(DIST, lang, page.out), renderPage(lang, page));
-  }
+fs.mkdirSync(DIST, { recursive: true });
+for (const page of PAGES) {
+  fs.writeFileSync(path.join(DIST, page.out), renderPage(page));
 }
-assertStringParity();
-for (const lang of LANGS) {
-  fs.writeFileSync(path.join(DIST, `i18n.${lang}.js`), clientI18n(lang));
-}
+fs.writeFileSync(path.join(DIST, "i18n.js"), clientI18n());
 fs.writeFileSync(path.join(DIST, "sitemap.xml"), sitemap());
 
 // Copy shared static assets verbatim.
@@ -211,5 +242,4 @@ for (const f of fs.readdirSync(path.join(SRC, "static"))) {
   fs.copyFileSync(path.join(SRC, "static", f), path.join(DIST, f));
 }
 
-const pages = PAGES.length * LANGS.length;
-console.log(`Built ${pages} pages -> dist/ (en, nl) + i18n.<lang>.js, sitemap.xml, static assets.`);
+console.log(`Built ${PAGES.length} pages -> dist/ (flat) + i18n.js, sitemap.xml, static assets.`);

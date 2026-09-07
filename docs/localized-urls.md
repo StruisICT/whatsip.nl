@@ -1,5 +1,13 @@
 # Plan: localized URLs (NL/EN) for SEO
 
+> **⚠️ SUPERSEDED (Sept 2026).** This design (subdirectory `/en//nl/` URLs + an
+> `Accept-Language` root redirect + hreflang) was **reversed**. The site is now
+> **flat** (`/`, `/ipv6`, `/browser`, …) with **client-side** language switching and
+> **no redirects** — chosen for speed and a simpler structure. Trade-off accepted:
+> Google indexes the baked language (EN) per URL. Legacy `/en/*` and `/nl/*` URLs 301
+> to their flat path. See `README.md` / `PLAN.md` for the current architecture; this
+> file is kept only as a record of the previous approach.
+
 ## Why change the current approach
 
 Today i18n is **client-side**: one HTML per page, text swapped by `i18n.js`. That's

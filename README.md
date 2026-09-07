@@ -13,19 +13,22 @@ Ad-free: AdSense was removed entirely in July 2026. See [`LAUNCH.md`](./LAUNCH.m
 
 ## Layout
 
-Bilingual (NL/EN) static site generated from `src/` into `dist/`.
+Bilingual (NL/EN) static site generated from `src/` into `dist/`. Pages are served
+at **flat paths** with **no redirects**; the language is switched **client-side**
+(a `#lang` toggle + `navigator.language` auto-detect), so each page has one URL.
 
 - `src/strings.json` — single source of all NL/EN copy.
 - `src/pages/*.html` + `*.js` — per-page content fragment + its script.
-- `src/static/*` — shared assets (`style.css`, `app.js`, `_headers`, `_redirects`, `robots.txt`).
-- `scripts/build.mjs` — generator → `dist/en/*`, `dist/nl/*`, `i18n.en.js`/`i18n.nl.js`, `sitemap.xml`.
-- `functions/index.ts` — `/` → `Accept-Language` 302 to `/nl/` or `/en/`.
+- `src/static/*` — shared assets (`style.css`, `app.js`, `sw.js`, `_headers`, `_redirects`, `robots.txt`).
+- `scripts/build.mjs` — generator → flat `dist/*.html` (text baked in English, every
+  `{{t:key}}` wrapped as `<span data-i18n>`), one `dist/i18n.js` (full NL/EN dictionary
+  + in-place language swap), and `sitemap.xml`.
 - `functions/api/info.ts` — edge JSON `{ ip, asn, org, country, ... }`.
 - `functions/api/headers.ts` — edge JSON of request headers (cookies redacted).
 - `functions/ip.ts` — plain-text IP (`curl whatsip.nl/ip`).
 
-Live URLs: `/en/  /en/browser  /en/headers  /en/webrtc  /en/ipv6  /en/privacy`
-(and the `/nl/` equivalents). See [`docs/localized-urls.md`](docs/localized-urls.md).
+Live URLs: `/  /ipv6  /browser  /headers  /webrtc  /storage  /geolocation  /permissions  /api  /about  /privacy`.
+Legacy `/en/*` and `/nl/*` URLs 301 to their flat path. See [`docs/localized-urls.md`](docs/localized-urls.md).
 
 ## Deploy
 
